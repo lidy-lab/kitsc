@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KITSC — National Teams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & TOKENS ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:        #00A651;
+  --green-dark:   #73978594;
+  --pitch:        #cfcfcf;
+  --pitch-mid:    #0E2914;
+  --pitch-card:   #122118;
+  --white:        #545454;
+  --muted:        #7d7d7d;
+  --border:       rgba(0,166,81,0.18);
+  --border-hi:    rgba(0,166,81,0.45);
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --radius-sm:    4px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--pitch);
+  color: var(--white);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* noise grain overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .5;
+}
+
+/* ─── PITCH DECORATION ───────────────────────────────────── */
+.pitch-bg {
+  position: fixed; inset: 0;
+  z-index: 0; overflow: hidden; pointer-events: none;
+}
+.pitch-bg::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: 50%; transform: translateX(-50%);
+  width: 140%; height: 70%;
+  border: 1px solid rgba(0,166,81,.06);
+  border-radius: 50%;
+}
+.pitch-line { position: absolute; background: rgba(0,166,81,.04); }
+.pitch-line.h { width: 100%; height: 1px; }
+.pitch-line.v { width: 1px; height: 100%; }
+
+/* ─── HEADER ─────────────────────────────────────────────── */
+header {
+  position: relative; z-index: 10;
+  padding: 0 3rem;
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1400px; margin: 0 auto; padding: 1.2rem 0;
+}
+.logo { display: flex; align-items: baseline; gap: .5rem; cursor: pointer; }
+.logo-main {
+  font-family: var(--font-display); font-size: 28px;
+  letter-spacing: 2px; line-height: 1;
+}
+.logo-tag {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green); border: 1px solid var(--green);
+  padding: 2px 6px; border-radius: 3px;
+}
+.header-nav { display: flex; gap: 2rem; align-items: center; }
+.nav-link {
+  font-size: 13px; color: var(--muted);
+  text-decoration: none; letter-spacing: .5px;
+  transition: color .2s; cursor: pointer;
+}
+.nav-link:hover        { color: var(--white); }
+.nav-link.active       { color: var(--green); font-weight: 500; }
+.header-cart {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--muted); cursor: pointer;
+  border: 1px solid var(--border); padding: 7px 14px;
+  border-radius: var(--radius-sm); transition: all .2s;
+  position: relative;
+}
+.header-cart:hover { border-color: var(--border-hi); color: var(--white); }
+.cart-badge {
+  position: absolute; top: -7px; right: -7px;
+  background: var(--green); color: #fff;
+  font-size: 10px; font-weight: 700;
+  min-width: 18px; height: 18px; border-radius: 9px;
+  display: none; align-items: center; justify-content: center;
+  padding: 0 4px;
+}
+
+/* ─── HERO ───────────────────────────────────────────────── */
+.hero {
+  position: relative; z-index: 5;
+  padding: 5rem 3rem 4rem;
+  max-width: 1400px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: end;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+}
+.hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--green); }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 8vw, 96px);
+  line-height: .92; letter-spacing: 2px;
+}
+.hero-title span  { color: var(--green); }
+.hero-subtitle    { margin-top: 1.5rem; font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 420px; }
+.hero-stats       { display: flex; gap: 3rem; align-self: end; padding-bottom: .5rem; }
+.stat-block       { text-align: right; }
+.stat-num         { font-family: var(--font-display); font-size: 48px; color: var(--green); line-height: 1; letter-spacing: 1px; }
+.stat-label       { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+/* ─── CONTROLS ───────────────────────────────────────────── */
+.controls {
+  position: relative; z-index: 10;
+  background: var(--pitch-mid);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1.2rem 3rem;
+}
+.controls-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+}
+.search-wrap  { position: relative; flex: 1; min-width: 200px; }
+.search-icon  {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 14px; pointer-events: none;
+}
+.search-wrap input {
+  width: 100%; background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 14px 10px 38px;
+  font-family: var(--font-body); font-size: 14px; color: var(--white);
+  outline: none; transition: border-color .2s;
+}
+.search-wrap input::placeholder { color: var(--muted); }
+.search-wrap input:focus         { border-color: var(--border-hi); }
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .5px;
+  padding: 7px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer;
+  background: transparent; color: var(--muted);
+  transition: all .18s; white-space: nowrap;
+}
+.chip:hover        { border-color: var(--border-hi); color: var(--white); }
+.chip.active       { background: var(--green); border-color: var(--green); color: #fff; font-weight: 500; }
+.sort-select {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 12px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  outline: none; cursor: pointer;
+}
+.sort-select option { background: var(--pitch-mid); }
+
+/* ─── MAIN / GRID ────────────────────────────────────────── */
+.main {
+  position: relative; z-index: 5;
+  max-width: 1400px; margin: 0 auto;
+  padding: 2.5rem 3rem 5rem;
+}
+.results-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem;
+}
+.results-count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: .5px; }
+.results-count span { color: var(--green); }
+.view-toggle { display: flex; gap: 4px; }
+.vbtn {
+  width: 34px; height: 34px; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; color: var(--muted);
+}
+.vbtn.active, .vbtn:hover { border-color: var(--border-hi); color: var(--white); }
+.vbtn svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* ─── KIT CARDS ──────────────────────────────────────────── */
+.kit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.kit-grid.list-view { grid-template-columns: 1fr; }
+
+.kit-card {
+  background: var(--pitch-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  transition: border-color .2s, transform .2s;
+  animation: fadeUp .4s both;
+}
+.kit-card:hover { border-color: var(--border-hi); transform: translateY(-3px); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* card image area */
+.card-visual {
+  aspect-ratio: 4/3;
+  background: var(--pitch);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.card-visual::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(0,166,81,.06) 0%, transparent 70%);
+  z-index: 1;
+}
+.card-img {
+  width: 210px; height: 210px;
+  object-fit: contain;
+  transition: transform .35s ease;
+  position: relative; z-index: 0;
+}
+.kit-card:hover .card-img { transform: scale(1.06); }
+
+/* fallback SVG shirt (shown when no image) */
+.card-shirt-fallback {
+  width: 100px; height: 120px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,.4));
+  transition: transform .3s;
+  position: relative; z-index: 0;
+}
+.kit-card:hover .card-shirt-fallback { transform: scale(1.06) rotate(-2deg); }
+
+.card-flag   { position: absolute; top: 12px; right: 14px; font-size: 22px; line-height: 1; z-index: 2; }
+.card-season { position: absolute; bottom: 10px; left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .5px; z-index: 2; }
+
+.card-body     { padding: 14px 16px 16px; }
+.card-nation   { font-family: var(--font-mono); font-size: 10px; color: var(--green); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+.card-name     { font-size: 15px; font-weight: 500; line-height: 1.3; margin-bottom: 4px; color: #cfcfcf}
+.card-version  { font-size: 11px; color: var(--pitch); margin-bottom: 10px; }
+.card-footer   { display: flex; align-items: center; justify-content: space-between; }
+.card-price    { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; line-height: 1; color: #cfcfcf}
+.card-price sup { font-family: var(--font-mono); font-size: 10px; vertical-align: super; color: var(--pitch); }
+
+.kit-type-badge { font-family: var(--font-mono); font-size: 10px; padding: 4px 10px; border-radius: 3px; letter-spacing: .5px; font-weight: 500; }
+.badge-home  { background: rgba(0,166,81,.15);  color: #4CD88A; border: 1px solid rgba(0,166,81,.3); }
+.badge-away  { background: rgba(255,102,0,.12); color: #FF8C42; border: 1px solid rgba(255,102,0,.3); }
+.badge-third { background: rgba(255,193,7,.12); color: #FFD54F; border: 1px solid rgba(255,193,7,.3); }
+
+.customize-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; margin-top: 12px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 5px; color: var(--muted);
+  font-family: var(--font-body); font-size: 13px;
+  padding: 9px 14px; cursor: pointer;
+  transition: all .2s; justify-content: center;
+}
+.customize-btn:hover { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* list view tweaks */
+.kit-grid.list-view .kit-card { display: grid; grid-template-columns: 160px 1fr; }
+.kit-grid.list-view .card-visual { aspect-ratio: auto; min-height: 140px; }
+
+/* ─── PRODUCT MODAL ──────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.78); z-index: 100;
+  align-items: center; justify-content: center;
+  padding: 1.5rem; backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--pitch-mid);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-lg);
+  width: 100%; max-width: 820px; max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn .25s both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 1.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; }
+.modal-close {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); width: 32px; height: 32px;
+  cursor: pointer; color: var(--muted); font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.modal-close:hover { border-color: var(--border-hi); color: var(--white); }
+
+.modal-body {
+  display: grid; grid-template-columns: 220px 1fr;
+  gap: 2rem; padding: 1.75rem;
+}
+
+/* left: image preview panel */
+.modal-visual {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1rem;
+}
+
+/* ── zoom container ── */
+.modal-img-wrap {
+  width: 180px; height: 220px;
+  background: var(--pitch);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  cursor: crosshair;
+  user-select: none;
+}
+.modal-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+}
+
+/* magnifier lens — follows cursor */
+.zoom-lens {
+  display: none;
+  position: absolute;
+  width: 80px; height: 80px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 0 0 3px rgba(0,166,81,.2), inset 0 0 12px rgba(0,0,0,.3);
+  transform: translate(-50%, -50%);
+}
+.modal-img-wrap:hover .zoom-lens { display: block; }
+
+/* zoom hint badge */
+.zoom-hint {
+  position: absolute; bottom: 8px; right: 8px;
+  background: rgba(0,166,81,.85); color: #fff;
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: .5px; padding: 3px 7px;
+  border-radius: 3px; pointer-events: none;
+  z-index: 5; opacity: .9;
+  transition: opacity .2s;
+}
+.modal-img-wrap:hover .zoom-hint { opacity: 0; }
+
+/* click-to-expand icon */
+.zoom-expand-btn {
+  position: absolute; top: 8px; right: 8px;
+  width: 26px; height: 26px;
+  background: rgba(0,0,0,.5); border: 1px solid var(--border-hi);
+  border-radius: 4px; cursor: pointer; z-index: 6;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.zoom-expand-btn:hover { background: var(--green); }
+.zoom-expand-btn svg { width: 13px; height: 13px; stroke: #fff; fill: none; }
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.92); z-index: 500;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+  cursor: zoom-out;
+  padding: 1rem;
+}
+.lightbox.open { display: flex; }
+
+.lightbox-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+  animation: lbIn .2s ease both;
+}
+@keyframes lbIn {
+  from { opacity: 0; transform: scale(.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* zoom-pan canvas (JS-powered) */
+.lightbox-inner canvas {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hi);
+  cursor: crosshair;
+  /* sin width/height fijos en CSS — los controla JS */
+}
+
+/* lightbox zoom-pan canvas (JS-powered) */
+.lightbox-inner canvas {
+  max-width: 100%; max-height: 85vh;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-hi);
+  cursor: crosshair;
+  display: block;
+}
+
+.lightbox-close {
+  position: absolute; top: -14px; right: -14px;
+  width: 30px; height: 30px;
+  background: var(--pitch-mid); border: 1px solid var(--border-hi);
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--white);
+  transition: background .15s;
+  z-index: 10;
+}
+.lightbox-close:hover { background: var(--green); }
+
+.lightbox-kit-label {
+  position: absolute; bottom: -28px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--muted); letter-spacing: .5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lightbox-kit-label span { color: var(--green); }
+
+.lightbox-zoom-bar {
+  position: absolute; bottom: -56px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+}
+.lightbox-zoom-bar input[type=range] {
+  width: 100px; accent-color: var(--green); cursor: pointer;
+}
+.lightbox-zoom-val {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--white); min-width: 32px; text-align: center;
+}
+.lb-zoom-btn {
+  width: 26px; height: 26px; background: transparent;
+  border: 1px solid var(--border); border-radius: 3px;
+  color: var(--muted); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; line-height: 1;
+}
+.lb-zoom-btn:hover { border-color: var(--border-hi); color: var(--white); }
+
+/* Móvil: barra de zoom más compacta y pegada */
+@media (max-width: 768px) {
+  .lightbox { padding: .5rem; align-items: center; }
+  .lightbox-inner { margin-bottom: 64px; }
+  .lightbox-close { top: -10px; right: -10px; width: 26px; height: 26px; font-size: 13px; }
+  .lightbox-kit-label { font-size: 10px; bottom: -22px; }
+  .lightbox-zoom-bar { bottom: -48px; gap: 6px; }
+  .lightbox-zoom-bar input[type=range] { width: 80px; }
+  .lb-zoom-btn { width: 24px; height: 24px; font-size: 14px; }
+}
+
+/* name/number overlay on modal image */
+.modal-preview-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(11,31,16,.88);
+  padding: 7px; border-radius: 0 0 7px 7px;
+  text-align: center; display: none;
+  z-index: 4;
+}
+.modal-preview-name   { font-family: var(--font-display); font-size: 12px; letter-spacing: 1px; line-height: 1.3; }
+.modal-preview-number { font-family: var(--font-display); font-size: 24px; color: var(--green); line-height: 1; }
+
+.modal-info {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); text-align: center;
+  line-height: 1.8; white-space: pre-line;
+}
+
+/* right: form */
+.modal-form { display: flex; flex-direction: column; gap: 1.2rem; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green); letter-spacing: 1px; text-transform: uppercase;
+}
+.form-label span { color: var(--muted); font-size: 10px; margin-left: 6px; letter-spacing: 0; text-transform: none; }
+
+/* sizes */
+.size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.size-btn {
+  width: 46px; height: 40px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--muted);
+  font-family: var(--font-mono); font-size: 12px;
+  cursor: pointer; transition: all .15s;
+}
+.size-btn:hover          { border-color: var(--border-hi); color: var(--white); }
+.size-btn.selected       { background: var(--green); border-color: var(--green); color: #fff; font-weight: 700; }
+
+/* badge options */
+.badge-options { display: flex; flex-direction: column; gap: 6px; }
+.badge-opt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: 5px; cursor: pointer; transition: all .15s;
+}
+.badge-opt:hover      { border-color: var(--border-hi); }
+.badge-opt.selected   { border-color: var(--green); background: rgba(0,166,81,.08); }
+.badge-opt input[type=radio] { accent-color: var(--green); cursor: pointer; }
+.badge-opt-label  { font-size: 13px; color: var(--white); flex: 1; }
+.badge-opt-price  { font-family: var(--font-mono); font-size: 11px; color: var(--green); }
+
+/* text inputs */
+.form-input {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); border-radius: 5px;
+  padding: 9px 12px;
+  font-family: var(--font-body); font-size: 14px; color: var(--white);
+  outline: none; transition: border-color .2s; width: 100%;
+}
+.form-input::placeholder { color: var(--muted); }
+.form-input:focus        { border-color: var(--border-hi); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* price row */
+.price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 1rem; border-top: 1px solid var(--border);
+}
+.price-total-label { font-size: 13px; color: var(--muted); }
+.price-total-val   { font-family: var(--font-display); font-size: 30px; letter-spacing: 1px; }
+.price-total-val sup { font-family: var(--font-mono); font-size: 11px; color: var(--muted); vertical-align: super; }
+.price-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-align: right; line-height: 1.8; }
+
+.add-to-cart-btn {
+  width: 100%; padding: 12px;
+  background: var(--green); border: none; border-radius: 6px;
+  color: #fff; font-family: var(--font-display);
+  font-size: 18px; letter-spacing: 2px;
+  cursor: pointer; transition: background .2s, transform .15s;
+}
+.add-to-cart-btn:hover  { background: var(--green-dark); }
+.add-to-cart-btn:active { transform: scale(.98); }
+
+/* ─── CART SIDE PANEL ────────────────────────────────────── */
+.cart-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); z-index: 200; backdrop-filter: blur(3px);
+}
+.cart-overlay.open { display: block; }
+
+.cart-panel {
+  position: fixed; top: 0; right: 0; height: 100%;
+  width: min(540px, 100vw);
+  background: var(--pitch-mid);
+  border-left: 1px solid var(--border-hi);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.cart-panel.open { transform: translateX(0); }
+
+.cart-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.cart-panel-title { font-family: var(--font-display); font-size: 24px; letter-spacing: 2px; }
+.cart-close {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); width: 32px; height: 32px;
+  cursor: pointer; color: var(--muted); font-size: 18px;
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.cart-close:hover { border-color: var(--border-hi); color: var(--white); }
+
+/* cart table */
+.cart-table-wrap { padding: 0 1.5rem; flex: 1; overflow-y: auto; }
+.cart-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.cart-table th {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+  padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left;
+}
+.cart-table td { padding: 12px 6px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
+.cart-table th:nth-child(2), .cart-table td:nth-child(2) { text-align: right; white-space: nowrap; }
+.cart-table th:nth-child(3), .cart-table td:nth-child(3) { text-align: center; }
+.cart-table th:nth-child(4), .cart-table td:nth-child(4) { text-align: right; white-space: nowrap; }
+.cart-table th:nth-child(5), .cart-table td:nth-child(5) { text-align: center; width: 32px; }
+
+.cart-item-name   { font-weight: 500; color: var(--white); font-size: 13px; line-height: 1.3; }
+.cart-item-detail { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.cart-item-custom { font-family: var(--font-mono); font-size: 10px; color: var(--green); margin-top: 2px; }
+
+/* cart thumbnail */
+.cart-thumb {
+  width: 44px; height: 44px; border-radius: 4px;
+  object-fit: contain; background: var(--pitch);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cart-item-row { display: flex; align-items: flex-start; gap: 10px; }
+.cart-item-text { display: flex; flex-direction: column; }
+
+.qty-ctrl { display: flex; align-items: center; gap: 5px; justify-content: center; }
+.qty-btn {
+  width: 22px; height: 22px; background: transparent;
+  border: 1px solid var(--border); border-radius: 3px;
+  color: var(--muted); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; line-height: 1;
+}
+.qty-btn:hover        { border-color: var(--border-hi); color: var(--white); }
+.qty-val              { font-family: var(--font-mono); font-size: 12px; min-width: 18px; text-align: center; }
+.cart-price-cell      { font-family: var(--font-mono); font-size: 12px; color: var(--white); }
+.cart-remove          { background: transparent; border: none; cursor: pointer; color: var(--muted); padding: 3px; font-size: 14px; transition: color .15s; }
+.cart-remove:hover    { color: #FF6B6B; }
+.empty-cart           { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.empty-cart-icon      { font-size: 36px; opacity: .3; margin-bottom: .8rem; }
+
+/* cart summary */
+.cart-summary { padding: 1.5rem; border-top: 1px solid var(--border); background: var(--pitch); flex-shrink: 0; }
+.summary-title { font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; margin-bottom: 1rem; }
+.discount-select {
+  width: 100%; background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); border-radius: 5px;
+  padding: 9px 12px; font-family: var(--font-mono); font-size: 11px;
+  color: var(--muted); outline: none; margin-bottom: .9rem; cursor: pointer;
+}
+.discount-select option { background: var(--pitch-mid); }
+.coupon-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+.coupon-input {
+  flex: 1; background: rgba(255,255,255,.04);
+  border: 1px solid var(--border); border-radius: 5px;
+  padding: 9px 12px; font-family: var(--font-body);
+  font-size: 13px; color: var(--white); outline: none;
+}
+.coupon-input::placeholder { color: var(--muted); }
+.coupon-input:focus        { border-color: var(--border-hi); }
+.coupon-apply {
+  background: var(--green); border: none; border-radius: 5px;
+  padding: 9px 16px; color: #fff; font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 1px; cursor: pointer;
+  transition: background .2s; white-space: nowrap;
+}
+.coupon-apply:hover { background: var(--green-dark); }
+.summary-lines { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.1rem; }
+.summary-line  { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.s-label       { color: var(--muted); }
+.s-val         { font-family: var(--font-mono); font-size: 12px; color: var(--white); }
+.summary-line.discount .s-val { color: #4CD88A; }
+.summary-line.total            { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+.summary-line.total .s-label  { font-size: 14px; font-weight: 500; color: var(--white); }
+.summary-line.total .s-val    { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; }
+.checkout-btn {
+  width: 100%; padding: 13px;
+  background: var(--green); border: none; border-radius: 6px;
+  color: #fff; font-family: var(--font-display);
+  font-size: 18px; letter-spacing: 2px; cursor: pointer;
+  transition: background .2s; margin-bottom: 8px;
+}
+.checkout-btn:hover { background: var(--green-dark); }
+.continue-btn {
+  width: 100%; padding: 10px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px;
+  cursor: pointer; transition: all .2s;
+}
+.continue-btn:hover { border-color: var(--border-hi); color: var(--white); }
+
+/* ─── EMPTY STATE ────────────────────────────────────────── */
+.empty-state { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; color: var(--muted); }
+.empty-state h3 { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; margin-bottom: .5rem; color: var(--white); }
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 5;
+  border-top: 1px solid var(--border);
+  padding: 2rem 3rem; text-align: center;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--muted); letter-spacing: .5px;
+}
+footer span { color: var(--green); }
+
+/* ─── SHIPPING OPTIONS ────────────────────────────────────── */
+.shipping-options { display: flex; flex-direction: column; gap: 8px; }
+.shipping-opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 5px; cursor: pointer; transition: all .15s;
+}
+.shipping-opt:hover    { border-color: var(--border-hi); }
+.shipping-opt.selected { border-color: var(--green); background: rgba(0,166,81,.08); }
+.shipping-opt input[type=radio] { accent-color: var(--green); cursor: pointer; margin-top: 2px; flex-shrink: 0; }
+.shipping-opt-info { flex: 1; }
+.shipping-opt-label { font-size: 13px; color: var(--white); font-weight: 500; }
+.shipping-opt-desc  { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: .3px; }
+.shipping-opt-price { font-family: var(--font-mono); font-size: 12px; color: var(--green); white-space: nowrap; padding-top: 1px; }
+
+/* ─── INVOICE MODAL ──────────────────────────────────────── */
+.invoice-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 300;
+  align-items: center; justify-content: center;
+  padding: 1rem; backdrop-filter: blur(6px);
+}
+.invoice-overlay.open { display: flex; }
+.invoice-box {
+  background: #fff; color: #111;
+  border-radius: 10px; width: 100%; max-width: 620px; max-height: 92vh;
+  overflow-y: auto; animation: modalIn .25s both;
+  font-family: 'DM Sans', sans-serif;
+}
+.inv-header {
+  background: #0E2914; color: #fff;
+  padding: 1.5rem 2rem; display: flex;
+  align-items: center; justify-content: space-between;
+  border-radius: 10px 10px 0 0;
+}
+.inv-brand { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; }
+.inv-brand-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: #4CD88A; margin-top: 2px; letter-spacing: 1px; }
+.inv-meta { text-align: right; font-family: 'DM Mono', monospace; font-size: 11px; color: #8A9E8F; line-height: 1.8; }
+.inv-meta span { color: #fff; }
+.inv-body { padding: 1.5rem 2rem; }
+.inv-section-title {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: #00A651;
+  border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-bottom: .8rem; margin-top: 1.2rem;
+}
+.inv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.inv-table th {
+  background: #f5f5f5; font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  color: #666; padding: 8px 10px; text-align: left;
+  border-bottom: 2px solid #e0e0e0;
+}
+.inv-table td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+.inv-table tr:last-child td { border-bottom: none; }
+.inv-totals { margin-top: .8rem; }
+.inv-total-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 13px; }
+.inv-total-row.final { border-top: 2px solid #0E2914; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 16px; }
+.inv-total-row .lbl { color: #555; }
+.inv-total-row.final .lbl { color: #111; }
+.inv-total-row .amt { font-family: 'DM Mono', monospace; }
+.inv-total-row.final .amt { color: #00A651; font-size: 20px; }
+.inv-footer { background: #f9f9f9; padding: 1rem 2rem; text-align: center; font-size: 11px; color: #888; border-radius: 0 0 10px 10px; border-top: 1px solid #e0e0e0; }
+.inv-actions { display: flex; gap: 10px; padding: 1rem 2rem; border-top: 1px solid #e0e0e0; background: #fafafa; }
+.inv-btn {
+  flex: 1; padding: 11px; border: none; border-radius: 6px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px;
+  cursor: pointer; transition: background .2s;
+}
+.inv-btn-primary { background: #00A651; color: #fff; }
+.inv-btn-primary:hover { background: #007A3D; }
+.inv-btn-secondary { background: #e0e0e0; color: #333; }
+.inv-btn-secondary:hover { background: #ccc; }
+.inv-btn-whatsapp { background: #25D366; color: #fff; flex: 1.2; }
+.inv-btn-whatsapp:hover { background: #1ebe57; }
+.inv-shipping-row { display: flex; justify-content: space-between; font-size: 12px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.inv-shipping-row .lbl { color: #555; }
+.inv-shipping-row .val { font-family: 'DM Mono', monospace; color: #111; }
+
+/* ─── INVOICE BUTTON in cart ─────────────────────────────── */
+.invoice-btn {
+  width: 100%; padding: 10px;
+  background: transparent; border: 1px solid var(--green);
+  border-radius: 6px; color: var(--green);
+  font-family: var(--font-display); font-size: 16px; letter-spacing: 2px;
+  cursor: pointer; transition: all .2s; margin-bottom: 8px;
+}
+.invoice-btn:hover { background: var(--green); color: #fff; }
+
+/* shipping summary line */
+.summary-line.shipping .s-val { color: #06158a; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .hero { gap: 2.5rem; padding: 4rem 2rem 3rem; }
+  .modal-body { grid-template-columns: 190px 1fr; gap: 1.5rem; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  header { padding: 0 1rem; }
+  .controls { padding: 1rem; }
+  .main { padding: 1.5rem 1rem 4rem; }
+  .hero { padding: 2rem 1rem 1.5rem; grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero-title { font-size: clamp(44px, 12vw, 72px); }
+  .hero-stats { justify-content: flex-start; gap: 2rem; }
+  .hero-subtitle { font-size: 14px; }
+  .kit-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: .9rem; }
+  .header-nav { display: none; }
+
+  /* MODAL responsivo móvil — mostrar imagen arriba */
+  .modal { max-width: 100%; border-radius: var(--radius-md); }
+  .modal-body {
+    grid-template-columns: 1fr;
+    gap: 1rem; padding: 1rem;
+  }
+  .modal-visual {
+    display: flex !important; /* sobreescribe el display:none anterior */
+    flex-direction: row;
+    align-items: center; gap: 1rem;
+    background: var(--pitch);
+    border-radius: var(--radius-md);
+    padding: .75rem;
+  }
+  .modal-img-wrap {
+    width: 100px; height: 130px;
+    flex-shrink: 0;
+  }
+  .modal-info { text-align: left; font-size: 11px; }
+  /* ocultar lupa en móvil (no aplica con touch) */
+  .zoom-hint { display: none; }
+
+  .cart-panel { width: 100vw; }
+  .cart-table th:nth-child(2),
+  .cart-table td:nth-child(2) { display: none; }
+  .form-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .size-btn { width: 40px; height: 36px; font-size: 11px; }
+
+  /* invoice responsive */
+  .inv-header { flex-direction: column; gap: .8rem; text-align: center; }
+  .inv-meta { text-align: center; }
+  .inv-body { padding: 1rem; }
+  .inv-actions { flex-direction: column; }
+}
+
+/* Small phones */
+@media (max-width: 400px) {
+  .kit-grid { grid-template-columns: repeat(2, 1fr); gap: .7rem; }
+  .hero-stats { gap: 1.2rem; }
+  .stat-num { font-size: 36px; }
+  .modal-overlay { padding: .5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- pitch decoration -->
+<div class="pitch-bg">
+  <div class="pitch-line h" style="top:20%"></div>
+  <div class="pitch-line h" style="top:50%"></div>
+  <div class="pitch-line h" style="top:80%"></div>
+  <div class="pitch-line v" style="left:25%"></div>
+  <div class="pitch-line v" style="left:50%"></div>
+  <div class="pitch-line v" style="left:75%"></div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-main">KITSC</span>
+      <span class="logo-tag">NATIONAL TEAMS</span>
+    </div>
+    <nav class="header-nav">
+      <span class="nav-link active">National Teams</span>
+      <span class="nav-link">New Arrivals</span>
+    </nav>
+    <div class="header-cart" onclick="openCart()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+      My Cart
+      <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">2026 – 2027 Season</div>
+    <h1 class="hero-title">NATIONAL<br><span>TEAMS</span><br>KITS</h1>
+    <p class="hero-subtitle">
+      The latest international football jerseys.
+      Customize with your name, number &amp; badge patch before adding to cart.
+    </p>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-block"><div class="stat-num" id="statKits">0</div><div class="stat-label">Kits</div></div>
+    <div class="stat-block"><div class="stat-num" id="statNations">0</div><div class="stat-label">Nations</div></div>
+    <div class="stat-block"><div class="stat-num" id="statConfs">0</div><div class="stat-label">Confs</div></div>
+  </div>
+</section>
+
+<!-- ── CONTROLS ── -->
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search by team, kit or confederation…" oninput="renderGrid()">
+    </div>
+    <div class="filter-chips" id="chips"></div>
+    <select class="sort-select" id="sort" onchange="renderGrid()">
+      <option value="default">New arrivals</option>
+      <option value="alpha">A – Z</option>
+      <option value="price-asc">Price ↑</option>
+      <option value="price-desc">Price ↓</option>
+    </select>
+  </div>
+</div>
+
+<!-- ── MAIN GRID ── -->
+<main class="main">
+  <div class="results-bar">
+    <div class="results-count" id="meta"></div>
+    <div class="view-toggle">
+      <button class="vbtn active" id="btnGrid" onclick="setView('grid')" title="Grid view">
+        <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      </button>
+      <button class="vbtn" id="btnList" onclick="setView('list')" title="List view">
+        <svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="3" rx="1"/><rect x="1" y="7" width="14" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="kit-grid" id="grid"></div>
+</main>
+
+<footer><span>KITSC</span> · National Teams · 2026-27 Collection · All prices in USD</footer>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modalBox">
+
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Customize Kit</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- LEFT: product image + zoom + live name/number preview -->
+      <div class="modal-visual">
+        <div class="modal-img-wrap" id="imgWrap">
+          <img id="modalKitImg" src="" alt="Kit image">
+          <div class="zoom-lens" id="zoomLens"></div>
+          <button class="zoom-expand-btn" onclick="openLightbox(event)" title="View full size">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+          <div class="zoom-hint">HOVER TO ZOOM</div>
+          <div class="modal-preview-overlay" id="previewOverlay">
+            <div class="modal-preview-name"   id="previewName"></div>
+            <div class="modal-preview-number" id="previewNumber"></div>
+          </div>
+        </div>
+        <div class="modal-info" id="modalInfo"></div>
+      </div>
+
+      <!-- RIGHT: customization form -->
+      <div class="modal-form">
+
+        <div class="form-group">
+          <div class="form-label">Size Men S TO 2XL<span>* required</span></div>
+          <div class="form-label">Size Women S TO 2XL<span>* required</span></div>
+          <div class="form-label">Size Childrens 16 TO 28 <span>* required</span></div>
+
+          <div class="size-options">
+            <button class="size-btn" onclick="selectSize(this,'S')">S</button>
+            <button class="size-btn" onclick="selectSize(this,'M')">M</button>
+            <button class="size-btn" onclick="selectSize(this,'L')">L</button>
+            <button class="size-btn" onclick="selectSize(this,'XL')">XL</button>
+            <button class="size-btn" onclick="selectSize(this,'2XL')">2XL</button>
+            <button class="size-btn" onclick="selectSize(this,'16')">16</button>
+            <button class="size-btn" onclick="selectSize(this,'18')">18</button>
+            <button class="size-btn" onclick="selectSize(this,'20')">20</button>
+            <button class="size-btn" onclick="selectSize(this,'22')">22</button>
+            <button class="size-btn" onclick="selectSize(this,'24')">24</button>
+            <button class="size-btn" onclick="selectSize(this,'26')">26</button>
+            <button class="size-btn" onclick="selectSize(this,'28')">28</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Badge / Patch</div>
+          <div class="badge-options" id="badgeOptions">
+            <label class="badge-opt selected">
+              <input type="radio" name="badge" value="none" onchange="onBadgeChange(this)" checked>
+              <span class="badge-opt-label">No patch</span>
+              
+            </label>
+            <label class="badge-opt">
+              <input type="radio" name="badge" value="wc2026" onchange="onBadgeChange(this)">
+              <span class="badge-opt-label">🏆 FIFA World Cup 2026 (USA·MEX·CAN)</span>
+              <div class="badge-opt">+$4.00</div>
+           </label>
+
+            </label>
+            <!-- <label class="badge-opt">
+              <input type="radio" name="badge" value="wc_qualified" onchange="onBadgeChange(this)">
+              <span class="badge-opt-label">⭐ World Cup Qualified Badge</span>
+              
+            </label> -->
+            
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Name &amp; Number <span>optional</span></div>
+          <div class="form-row">
+            <input class="form-input" id="playerName"   placeholder="PLAYER NAME" maxlength="14" oninput="updatePreview()">
+            <input class="form-input" id="playerNumber" placeholder="00" maxlength="2"  oninput="updatePreview()"
+              style="text-align:center; font-family:var(--font-display); font-size:20px; letter-spacing:2px;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Remark <span>optional — special instructions</span></div>
+          <input class="form-input" id="remark" placeholder="Specify whether the T-shirt is for a man, a woman, or a child.">
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">Shipping Method <span>* required</span></div>
+          <div class="shipping-options" id="shippingOptions">
+            <label class="shipping-opt selected">
+              <input type="radio" name="shipping" value="ordinary" onchange="onShippingChange(this)" checked>
+              <div class="shipping-opt-info">
+                <div class="shipping-opt-label">📦 Ordinary Shipping</div>
+                <div class="shipping-opt-desc">40-45 business days</div>
+              </div>
+              <div class="shipping-opt-price">+$0.00</div>
+            </label>
+            <label class="shipping-opt">
+              <input type="radio" name="shipping" value="priority" onchange="onShippingChange(this)">
+              <div class="shipping-opt-info">
+                <div class="shipping-opt-label">🚀 Priority Shipping</div>
+                <div class="shipping-opt-desc">30-35 business days</div>
+              </div>
+              <div class="shipping-opt-price">+$10.00</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="price-row">
+          <div>
+            <div class="price-total-label">Total price</div>
+            <div class="price-total-val"><sup>US$</sup><span id="modalPriceVal">0.00</span></div>
+          </div>
+          <div class="price-meta">
+            Weight: 0.25–0.3 kg<br>
+            <span id="priceBreakdown"></span>
+          </div>
+        </div>
+
+        <button class="add-to-cart-btn" onclick="addToCart()">ADD TO CART</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CART PANEL ── -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+
+  <div class="cart-panel-header">
+    <div class="cart-panel-title">MY SHOPPING CART</div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+
+  <div class="cart-table-wrap">
+    <div class="empty-cart" id="emptyCartMsg">
+      <div class="empty-cart-icon">🛒</div>
+      <div style="font-size:14px">Your cart is empty</div>
+      <div style="font-size:12px;margin-top:6px">Browse kits and customize before adding</div>
+    </div>
+    <table class="cart-table" id="cartTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Goods</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cartRows"></tbody>
+    </table>
+  </div>
+
+  <div class="cart-summary">
+    <div class="summary-title">Cart Summary</div>
+    <select class="discount-select" id="discountSelect" onchange="updateSummary()">
+      <option value="0">No bulk discount</option>
+    </select>
+    <!-- <div class="coupon-row">
+      <input class="coupon-input" id="couponInput" placeholder="">
+      <button class="coupon-apply" onclick="applyCoupon()">Apply</button>
+    </div> -->
+    <div class="summary-lines">
+      <div class="summary-line">
+        <span class="s-label">Product Price</span>
+        <span class="s-val" id="sumProduct">US$ 0.00</span>
+      </div>
+      <div class="summary-line discount">
+        <span class="s-label">Promotion Discount</span>
+        <span class="s-val" id="sumDiscount">US$ -0.00</span>
+      </div>
+      <div class="summary-line">
+        <span class="s-label">Weight</span>
+        <span class="s-val" id="sumWeight">0.00 Kg</span>
+      </div>
+      <div class="summary-line shipping">
+        <span class="s-label">Shipping</span>
+        <span class="s-val" id="sumShipping">—</span>
+      </div>
+      <div class="summary-line total">
+        <span class="s-label">Total Price</span>
+        <span class="s-val" id="sumTotal">US$ 0.00</span>
+      </div>
+    </div>
+    <button class="invoice-btn" onclick="openInvoice()">📄 GENERATE INVOICE (PDF)</button>
+    <button class="checkout-btn">Proceed to Checkout</button>
+    <button class="continue-btn" onclick="closeCart()">&#60; Continue Shopping</button>
+  </div>
+</div>
+<!-- ── INVOICE MODAL ── -->
+<div class="invoice-overlay" id="invoiceOverlay" onclick="handleInvoiceOverlayClick(event)">
+  <div class="invoice-box" id="invoiceBox">
+    <div class="inv-header">
+      <div>
+        <div class="inv-brand">KITSC</div>
+        <div class="inv-brand-tag">NATIONAL TEAMS · 2026-27</div>
+      </div>
+      <div class="inv-meta">
+        <div>Invoice No: <span id="invNumber">—</span></div>
+        <div>Date: <span id="invDate">—</span></div>
+        <div>Status: <span style="color:#4CD88A">PENDING</span></div>
+      </div>
+    </div>
+    <div class="inv-body" id="invBody">
+      <!-- Filled by JS -->
+    </div>
+    <div class="inv-actions">
+      <button class="inv-btn inv-btn-primary" onclick="printInvoice()">🖨 Download / Print PDF</button>
+      <button class="inv-btn inv-btn-whatsapp" onclick="sendInvoiceWhatsApp()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.509 5.837L.057 23.215a.75.75 0 0 0 .916.916l5.378-1.452A11.956 11.956 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.75 9.75 0 0 1-4.964-1.356l-.356-.214-3.693.998.998-3.693-.214-.356A9.75 9.75 0 1 1 12 21.75z"/></svg>
+        Enviar por WhatsApp
+      </button>
+      <button class="inv-btn inv-btn-secondary" onclick="closeInvoice()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
+  <div class="lightbox-inner" id="lightboxInner">
+    <button class="lightbox-close" onclick="closeLightbox()">&#x2715;</button>
+    <canvas id="lbCanvas"></canvas>
+    <div class="lightbox-kit-label" id="lbLabel"></div>
+    <div class="lightbox-zoom-bar">
+      <button class="lb-zoom-btn" onclick="lbZoomStep(-0.25)">&#8722;</button>
+      <input type="range" id="lbZoomSlider" min="-1" max="4" step="0.1" value="1" oninput="lbZoomFromSlider()">
+      <span class="lightbox-zoom-val" id="lbZoomVal">1&times;</span>
+      <button class="lb-zoom-btn" onclick="lbZoomStep(0.25)">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AVISO -->
+<div id="avisoOverlay" class="aviso-overlay">
+  <div class="aviso-box">
+    <!-- accent bar top -->
+    <div class="aviso-accent-bar"></div>
+
+    <div class="aviso-inner">
+      <!-- icon badge -->
+      <div class="aviso-icon-wrap">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00A651" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+
+      <div class="aviso-eyebrow">Aviso Importante</div>
+      <h2 class="aviso-title">INFORMACIÓN<br><span>DEL PEDIDO</span></h2>
+
+      <div class="aviso-divider"></div>
+
+      <div class="aviso-items">
+        <div class="aviso-item">
+          <div class="aviso-item-icon">📅</div>
+          <div class="aviso-item-body">
+            <div class="aviso-item-label">Fecha límite de pedidos</div>
+            <div class="aviso-item-val">25 de Abril, 2026</div>
+          </div>
+        </div>
+        <div class="aviso-item">
+          <div class="aviso-item-icon">💳</div>
+          <div class="aviso-item-body">
+            <div class="aviso-item-label">Condición de pago</div>
+            <div class="aviso-item-val">50% anticipo · 50% contra entrega</div>
+          </div>
+        </div>
+        <div class="aviso-item">
+          <div class="aviso-item-icon">📦</div>
+          <div class="aviso-item-body">
+            <div class="aviso-item-label">Despacho estimado</div>
+            <div class="aviso-item-val">30–45 días hábiles tras confirmación</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="aviso-close-btn" id="cerrarModal">
+        Entendido — Ver Catálogo
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <p class="aviso-footnote">Al continuar aceptas nuestras condiciones de venta.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── AVISO MODAL ───────────────────────────────────────────── */
+.aviso-overlay {
+  display: flex;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.82);
+  z-index: 9999;
+  align-items: center; justify-content: center;
+  padding: 1.5rem;
+  backdrop-filter: blur(6px);
+  animation: avisoFadeIn .3s ease both;
+}
+.aviso-overlay.hidden { display: none; }
+
+@keyframes avisoFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.aviso-box {
+  background: #0E2914;
+  border: 1px solid rgba(0,166,81,.35);
+  border-radius: 14px;
+  width: 100%; max-width: 440px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(0,166,81,.08);
+  animation: avisoSlideUp .35s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+@keyframes avisoSlideUp {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.aviso-accent-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #00A651 0%, #4CD88A 60%, transparent 100%);
+}
+
+.aviso-inner {
+  padding: 2rem 2rem 1.5rem;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+
+.aviso-icon-wrap {
+  width: 56px; height: 56px;
+  background: rgba(0,166,81,.12);
+  border: 1px solid rgba(0,166,81,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.aviso-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: #00A651; margin-bottom: .5rem;
+}
+
+.aviso-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px; letter-spacing: 3px; line-height: 1;
+  color: #cfcfcf; margin-bottom: .2rem;
+}
+.aviso-title span { color: #00A651; }
+
+.aviso-divider {
+  width: 48px; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,166,81,.6), transparent);
+  margin: 1.2rem 0;
+}
+
+.aviso-items {
+  width: 100%; display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 1.6rem;
+}
+
+.aviso-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(0,166,81,.14);
+  border-radius: 8px;
+  padding: 11px 14px;
+  text-align: left;
+}
+
+.aviso-item-icon { font-size: 18px; line-height: 1.4; flex-shrink: 0; }
+
+.aviso-item-body { flex: 1; }
+
+.aviso-item-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+  color: #7d7d7d; margin-bottom: 3px;
+}
+
+.aviso-item-val {
+  font-size: 13px; font-weight: 500; color: #cfcfcf; line-height: 1.4;
+}
+
+.aviso-close-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: #00A651; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 13px 28px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  letter-spacing: .5px; cursor: pointer;
+  transition: background .2s, transform .15s;
+  width: 100%; justify-content: center;
+}
+.aviso-close-btn:hover { background: #007A3D; transform: translateY(-1px); }
+.aviso-close-btn:active { transform: translateY(0); }
+
+.aviso-footnote {
+  margin-top: 1rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: #555; letter-spacing: .5px;
+}
+
+@media (max-width: 480px) {
+  .aviso-box { border-radius: 10px; }
+  .aviso-inner { padding: 1.5rem 1.2rem 1.2rem; }
+  .aviso-title { font-size: 28px; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const overlay = document.getElementById("avisoOverlay");
+  const boton   = document.getElementById("cerrarModal");
+
+  boton.addEventListener("click", function () {
+    overlay.classList.add("hidden");
+  });
+
+  // Also close on overlay click
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay) overlay.classList.add("hidden");
+  });
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════════════════════════ -->
+<script>
+
+
+/* ─────────────────────────────────────────────────────────────
+   DATA
+   · image: ruta relativa a la carpeta del proyecto, p.ej. "images/arg1.jpg"
+   · El campo `image` se usará tanto en la card como en el modal.
+   · Si no existe la imagen, se muestra un placeholder gris automáticamente.
+───────────────────────────────────────────────────────────── */
+const KITS = [
+  { id: 1,  nation: "Argentina", name: "26-27 Argentina Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/arg1_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 2,  nation: "Argentina", name: "26-27 Argentina Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/arg2_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 3,  nation: "Argentina", name: "26-27 Argentina Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/arg1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 4,  nation: "Argentina", name: "26-27 Argentina Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/arg2_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 5,  nation: "Brasil", name: "26-27 Brasil Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/brasil1_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 6,  nation: "Brasil", name: "26-27 Brasil Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/brasil2_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 7,  nation: "Brasil", name: "26-27 Brasil Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/brasil1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 8,  nation: "Brasil", name: "26-27 Brasil Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/brasil2_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 9,  nation: "Portugal", name: "26-27 Portugal Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/portg1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 10,  nation: "Portugal", name: "26-27 Portugal Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/portg2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 11,  nation: "Portugal", name: "26-27 Portugal Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/portg1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 12,  nation: "Portugal", name: "26-27 Portugal Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/portg2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 13,  nation: "Colombia", name: "26-27 Colombia Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/colomb2_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 14,  nation: "Colombia", name: "26-27 Colombia Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/colomb1_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 15,  nation: "Colombia", name: "26-27 Colombia Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/colomb2_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 16,  nation: "Colombia", name: "26-27 Colombia Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/colomb1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 17,  nation: "Algeria", name: "26-27 Algeria Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/algeria2_plr.jpg",  flag: "", conf: "CAF" },
+  { id: 18,  nation: "Algeria", name: "26-27 Algeria Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/algeria2_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 19,  nation: "Algeria", name: "26-27 Algeria Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/algeria1_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 20,  nation: "Algeria", name: "26-27 Algeria Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/algeria2_plr.jpg",  flag: "", conf: "CAF" },
+  { id: 21,  nation: "Arabia Saudita", name: "26-27 Arabia Saudita Home",  season: "2026-27", type: "Home", version: "Player", price: 40, image: "images/asaudita1_plr.jpg",  flag: "", conf: "AFC" },
+  { id: 22,  nation: "Arabia Saudita", name: "26-27 Arabia Saudita Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/asaudita1_fn.jpg",  flag: "", conf: "AFC" },
+  { id: 23,  nation: "Austria", name: "26-27 Austria Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/austria2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 24,  nation: "Austria", name: "26-27 Austria Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/austria1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 25,  nation: "Belgica", name: "26-27 Belgica Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/belg1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 26,  nation: "Belgica", name: "26-27 Belgica Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/belg2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 27,  nation: "Belgica", name: "26-27 Belgica Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/belg1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 28,  nation: "Belgica", name: "26-27 Belgica Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/belg2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 29,  nation: "Canada", name: "26-27 Canada Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/canada1_plr.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 30,  nation: "Canada", name: "26-27 Canada Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/canada1_fn.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 31,  nation: "Croacia", name: "26-27 Croacia Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/croat1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 32,  nation: "Dinamarca", name: "26-27 Dinamarca Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/denmark1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 33,  nation: "Ecuador", name: "26-27 Ecuador Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/ecuad2_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 34,  nation: "Ecuador", name: "26-27 Ecuador Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/ecuad1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 35,  nation: "Inglaterra", name: "26-27 Inglaterra Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/england1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 36,  nation: "Inglaterra", name: "26-27 Inglaterra Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/england2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 37,  nation: "Inglaterra", name: "26-27 Inglaterra Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/england1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 38,  nation: "Inglaterra", name: "26-27 Inglaterra Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/england2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 39,  nation: "España", name: "26-27 España Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/esp1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 40,  nation: "España", name: "26-27 España Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/esp2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 41,  nation: "España", name: "26-27 España Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/esp1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 42,  nation: "España", name: "26-27 España Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/esp2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 43,  nation: "Francia", name: "26-27 Francia Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/france1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 44,  nation: "Francia", name: "26-27 Francia Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/france2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 45,  nation: "Francia", name: "26-27 Francia Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/france1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 46,  nation: "Francia", name: "26-27 Francia Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/france2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 47,  nation: "Alemania", name: "26-27 Alemania Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/germ1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 48,  nation: "Alemania", name: "26-27 Alemania Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/germ2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 49,  nation: "Alemania", name: "26-27 Alemania Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/germ1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 50,  nation: "Alemania", name: "26-27 Alemania Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/germ2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 51,  nation: "Italia", name: "26-27 Italia Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/itly1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 52,  nation: "Italia", name: "26-27 Italia Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/itly2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 53,  nation: "Italia", name: "26-27 Italia Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/itly1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 54,  nation: "Italia", name: "26-27 Italia Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/itly2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 55,  nation: "Japón", name: "26-27 Japón Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/japan1_plr.jpg",  flag: "", conf: "AFC" },
+  { id: 56,  nation: "Japón", name: "26-27 Japón Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/japan2_fn.jpg",  flag: "", conf: "AFC" },
+  { id: 57,  nation: "Japón", name: "26-27 Japón Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/japan1_fn.jpg",  flag: "", conf: "AFC" },
+  { id: 58,  nation: "Japón", name: "26-27 Japón Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/japan2_plr.jpg",  flag: "", conf: "AFC" },
+  { id: 59,  nation: "Corea del Sur", name: "26-27 Korea del Sur Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/korea2_fn.jpg",  flag: "", conf: "AFC" },
+  { id: 60,  nation: "Corea del Sur", name: "26-27 Korea del Sur Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/korea1_fn.jpg",  flag: "", conf: "AFC" },
+  { id: 61,  nation: "Corea del Sur", name: "26-27 Korea del Sur Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/korea2_plr.jpg",  flag: "", conf: "AFC" },  
+  { id: 62,  nation: "México", name: "26-27 México Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/mex1_plr.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 63,  nation: "México", name: "26-27 México Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/mex2_fn.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 64,  nation: "México", name: "26-27 México Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/mex1_fn.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 65,  nation: "México", name: "26-27 México Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/mex2_plr.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 66,  nation: "Marruecos", name: "26-27 Marruecos Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/moroco1_plr.jpg",  flag: "", conf: "CAF" },
+  { id: 67,  nation: "Marruecos", name: "26-27 Marruecos Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/moroco2_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 68,  nation: "Marruecos", name: "26-27 Marruecos Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/moroco1_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 69,  nation: "Marruecos", name: "26-27 Marruecos Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/moroco2_plr.jpg",  flag: "", conf: "CAF" },  
+  { id: 70,  nation: "Países Bajos", name: "26-27 Países Bajos Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/nether1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 71,  nation: "Países Bajos", name: "26-27 Países Bajos Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/nether2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 72,  nation: "Países Bajos", name: "26-27 Países Bajos Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/nether1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 73,  nation: "Países Bajos", name: "26-27 Países Bajos Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/nether2_plr.jpg",  flag: "", conf: "UEFA" },  
+  { id: 74,  nation: "Noruega", name: "26-27 Noruega Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/norway1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 75,  nation: "Noruega", name: "26-27 Noruega Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/norway1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 76,  nation: "Paraguay", name: "26-27 Paraguay Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/parag2_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 77,  nation: "Paraguay", name: "26-27 Paraguay Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/parag1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 78,  nation: "Senegal", name: "26-27 Senegal Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/senegal2_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 79,  nation: "Senegal", name: "26-27 Senegal Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/senegal1_fn.jpg",  flag: "", conf: "CAF" },
+  { id: 80,  nation: "Senegal", name: "26-27 Senegal Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/senegal2_plr.jpg",  flag: "", conf: "CAF" },
+  { id: 81,  nation: "Suecia", name: "26-27 Suecia Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/sweden1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 82,  nation: "Suecia", name: "26-27 Suecia Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/sweden2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 83,  nation: "Suecia", name: "26-27 Suecia Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/sweden1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 84,  nation: "Suiza", name: "26-27 Suiza Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/switzer1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 85,  nation: "Suiza", name: "26-27 Suiza Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/switzer2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 86,  nation: "Suiza", name: "26-27 Suiza Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/switzer1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 87,  nation: "Suiza", name: "26-27 Suiza Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/switzer2_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 88,  nation: "Turquía", name: "26-27 Turquía Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/turkey2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 89,  nation: "Turquía", name: "26-27 Turquía Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/turkey1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 90,  nation: "Uruguay", name: "26-27 Uruguay Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/urug1_plr.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 91,  nation: "Uruguay", name: "26-27 Uruguay Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/urug1_fn.jpg",  flag: "", conf: "CONMEBOL" },
+  { id: 92,  nation: "Estados Unidos", name: "26-27 Estados Unidos Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/usa1_plr.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 93,  nation: "Estados Unidos", name: "26-27 Estados Unidos Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/usa2_fn.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 94,  nation: "Estados Unidos", name: "26-27 Estados Unidos Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/usa1_fn.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 95,  nation: "Estados Unidos", name: "26-27 Estados Unidos Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/usa2_plr.jpg",  flag: "", conf: "CONCACAF" },
+  { id: 96,  nation: "Gales", name: "26-27 Gales Home",  season: "2026-27", type: "Home", version: "Player",    price: 40, image: "images/wales1_plr.jpg",  flag: "", conf: "UEFA" },
+  { id: 97,  nation: "Gales", name: "26-27 Gales Away",  season: "2026-27", type: "Away", version: "Fan",    price: 35, image: "images/wales2_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 98,  nation: "Gales", name: "26-27 Gales Home",  season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/wales1_fn.jpg",  flag: "", conf: "UEFA" },
+  { id: 99,  nation: "Gales", name: "26-27 Gales Away",  season: "2026-27", type: "Away", version: "Player", price: 40, image: "images/wales2_plr.jpg",  flag: "", conf: "UEFA" },
+
+  /* ── agrega más kits con su imagen correspondiente ──────── */
+  // { id: 5, nation: "Brazil", name: "26-27 Brazil Home", season: "2026-27", type: "Home", version: "Fan", price: 35, image: "images/bra1.jpg", flag: "🇧🇷", conf: "CONMEBOL" },
+];
+
+/* ─── BADGE CATALOGUE ──────────────────────────────────────── */
+const BADGE_PRICES = {
+  none: 0,
+  wc2026: 4,
+  
+};
+const BADGE_LABELS = {
+  none:             "No patch",
+  wc2026:           "FIFA World Cup 2026",
+  
+};
+
+/* ─── CONFEDERATIONS (derived from KITS) ─────────────────── */
+function getConfs() {
+  const set = new Set(KITS.map(k => k.conf));
+  return ["All", ...Array.from(set).sort()];
+}
+
+/* ─── STATE ─────────────────────────────────────────────────── */
+let activeConf   = "All";
+let currentView  = "grid";
+let currentKit   = null;
+let selectedSize = null;
+let selectedShipping = "ordinary";
+let cart         = [];
+let couponDiscount = 0;
+
+const SHIPPING = {
+  ordinary: { label: "Ordinary Shipping (40-45 days)", price: 0 },
+  priority: { label: "Priority Shipping (30-35 days)",  price: 10 }
+};
+
+/* ─────────────────────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────────────────────── */
+function badgeCls(type) {
+  return type === "Home" ? "badge-home" : type === "Away" ? "badge-away" : "badge-third";
+}
+
+/** Placeholder svg data-uri — shown when kit image fails to load */
+const PLACEHOLDER = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%230E2914'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238A9E8F' font-size='13' font-family='monospace'%3ENo image%3C/text%3E%3C/svg%3E`;
+
+function imgAttrs(src, alt) {
+  return `src="${src}" alt="${alt}" onerror="this.src='${PLACEHOLDER}'"`;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CONFEDERATION CHIPS
+───────────────────────────────────────────────────────────── */
+function buildChips() {
+  const confs = getConfs();
+  document.getElementById("chips").innerHTML = confs
+    .map(c => `<button class="chip${activeConf === c ? " active" : ""}" onclick="setConf('${c}')">${c}</button>`)
+    .join("");
+}
+
+function setConf(c) {
+  activeConf = c;
+  buildChips();
+  renderGrid();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VIEW TOGGLE
+───────────────────────────────────────────────────────────── */
+function setView(v) {
+  currentView = v;
+  document.getElementById("grid").classList.toggle("list-view", v === "list");
+  document.getElementById("btnGrid").classList.toggle("active", v === "grid");
+  document.getElementById("btnList").classList.toggle("active", v === "list");
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RENDER GRID
+   · Usa k.image para mostrar la imagen real del kit en la card.
+───────────────────────────────────────────────────────────── */
+function renderGrid() {
+  const query = document.getElementById("search").value.toLowerCase();
+  const sort  = document.getElementById("sort").value;
+
+  let items = KITS.filter(k => {
+    const matchConf = activeConf === "All" || k.conf === activeConf;
+    const matchQ    = !query
+      || k.nation.toLowerCase().includes(query)
+      || k.name.toLowerCase().includes(query)
+      || k.conf.toLowerCase().includes(query)
+      || k.version.toLowerCase().includes(query);
+    return matchConf && matchQ;
+  });
+
+  if (sort === "alpha")      items.sort((a, b) => a.nation.localeCompare(b.nation));
+  else if (sort === "price-asc")  items.sort((a, b) => a.price - b.price);
+  else if (sort === "price-desc") items.sort((a, b) => b.price - a.price);
+
+  const nations = new Set(items.map(k => k.nation)).size;
+  const confs   = new Set(items.map(k => k.conf)).size;
+
+  document.getElementById("meta").innerHTML       = `<span>${items.length}</span> kits · <span>${nations}</span> nations`;
+  document.getElementById("statKits").textContent    = items.length;
+  document.getElementById("statNations").textContent = nations;
+  document.getElementById("statConfs").textContent   = confs;
+
+  const grid = document.getElementById("grid");
+
+  if (!items.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div style="font-size:40px;opacity:.3;margin-bottom:.8rem">⚽</div>
+        <h3>No Kits Found</h3>
+        <p>Try a different search or filter.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((k, i) => `
+    <div class="kit-card" style="animation-delay:${i * .04}s" onclick="openModal(${k.id})">
+      <div class="card-visual">
+        <img class="card-img" ${imgAttrs(k.image, k.name)}>
+        <div class="card-flag">${k.flag}</div>
+        <div class="card-season">${k.season}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-nation">${k.nation} · ${k.conf}</div>
+        <div class="card-name">${k.name}</div>
+        <div class="card-version">${k.version} Version</div>
+        <div class="card-footer">
+          <div class="card-price"><sup>US$</sup>${k.price.toFixed(2)}</div>
+          <span class="kit-type-badge ${badgeCls(k.type)}">${k.type}</span>
+        </div>
+        <button class="customize-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Customize &amp; Add to Cart
+        </button>
+      </div>
+    </div>`).join("");
+}
+
+/* ─────────────────────────────────────────────────────────────
+   OPEN MODAL
+   · Carga la imagen real del kit buscando por k.id → k.image
+   · La ruta es relativa al proyecto: "images/arg1.jpg"
+───────────────────────────────────────────────────────────── */
+function openModal(id) {
+  currentKit = KITS.find(k => k.id === id);
+  if (!currentKit) return;
+
+  selectedSize = null;
+  selectedShipping = "ordinary";
+
+  /* reset form */
+  document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
+  document.querySelectorAll(".badge-opt").forEach(b => b.classList.remove("selected"));
+  document.querySelector(".badge-opt").classList.add("selected");
+  document.querySelector('input[name="badge"][value="none"]').checked = true;
+  document.querySelectorAll(".shipping-opt").forEach(b => b.classList.remove("selected"));
+  document.querySelector(".shipping-opt").classList.add("selected");
+  document.querySelector('input[name="shipping"][value="ordinary"]').checked = true;
+  document.getElementById("playerName").value   = "";
+  document.getElementById("playerNumber").value = "";
+  document.getElementById("remark").value       = "";
+  document.getElementById("previewOverlay").style.display = "none";
+
+  /* ── IMAGE: se carga desde k.image según el id del kit ── */
+  const modalImg = document.getElementById("modalKitImg");
+  modalImg.src   = currentKit.image;           // ruta desde la carpeta del proyecto
+  modalImg.alt   = currentKit.name;
+  modalImg.onerror = () => { modalImg.src = PLACEHOLDER; };  // fallback si no existe
+
+  /* header & meta */
+  document.getElementById("modalTitle").textContent =
+    `${currentKit.nation} ${currentKit.type} — ${currentKit.version} Version`;
+  document.getElementById("modalInfo").textContent  =
+    `${currentKit.flag}  ${currentKit.name}\n${currentKit.conf} · ${currentKit.season}`;
+
+  calcPrice();
+
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById("modalOverlay")) closeModal();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FORM INTERACTIONS
+───────────────────────────────────────────────────────────── */
+function selectSize(btn, size) {
+  document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  selectedSize = size;
+}
+
+function onBadgeChange(radio) {
+  document.querySelectorAll(".badge-opt").forEach(b => b.classList.remove("selected"));
+  radio.closest(".badge-opt").classList.add("selected");
+  calcPrice();
+}
+
+function onShippingChange(radio) {
+  document.querySelectorAll(".shipping-opt").forEach(b => b.classList.remove("selected"));
+  radio.closest(".shipping-opt").classList.add("selected");
+  selectedShipping = radio.value;
+  calcPrice();
+}
+
+/** Live name/number overlay on the kit image */
+function updatePreview() {
+  const name   = document.getElementById("playerName").value.trim().toUpperCase();
+  const number = document.getElementById("playerNumber").value.trim();
+  const overlay = document.getElementById("previewOverlay");
+
+  if (name || number) {
+    overlay.style.display = "block";
+    document.getElementById("previewName").textContent   = name;
+    document.getElementById("previewNumber").textContent = number;
+  } else {
+    overlay.style.display = "none";
+  }
+}
+
+function calcPrice() {
+  if (!currentKit) return;
+  const badgeVal  = document.querySelector('input[name="badge"]:checked')?.value || "none";
+  const extra     = BADGE_PRICES[badgeVal] || 0;
+  const shipCost  = SHIPPING[selectedShipping]?.price || 0;
+  const total     = (currentKit.price + extra + shipCost).toFixed(2);
+
+  document.getElementById("modalPriceVal").textContent  = total;
+  const parts = [];
+  if (extra > 0)    parts.push(`Badge +$${extra.toFixed(2)}`);
+  if (shipCost > 0) parts.push(`Ship +$${shipCost.toFixed(2)}`);
+  document.getElementById("priceBreakdown").textContent = parts.join(" · ");
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ADD TO CART
+───────────────────────────────────────────────────────────── */
+function addToCart() {
+  if (!currentKit) return;
+  if (!selectedSize) { alert("Please select a size."); return; }
+
+  const badgeVal  = document.querySelector('input[name="badge"]:checked')?.value || "none";
+  const extra     = BADGE_PRICES[badgeVal] || 0;
+  const shipCost  = SHIPPING[selectedShipping]?.price || 0;
+  const name      = document.getElementById("playerName").value.trim().toUpperCase();
+  const number    = document.getElementById("playerNumber").value.trim();
+  const remark    = document.getElementById("remark").value.trim();
+  const price     = parseFloat((currentKit.price + extra).toFixed(2));
+
+  /* merge if identical config already in cart */
+  const existIdx = cart.findIndex(i =>
+    i.kitId    === currentKit.id &&
+    i.size     === selectedSize  &&
+    i.badge    === badgeVal      &&
+    i.shipping === selectedShipping &&
+    i.name     === name          &&
+    i.number   === number
+  );
+
+  if (existIdx >= 0) {
+    cart[existIdx].qty++;
+  } else {
+    cart.push({
+      uid:          Date.now() + Math.random(),
+      kitId:        currentKit.id,
+      nation:       currentKit.nation,
+      kitName:      currentKit.name,
+      image:        currentKit.image,
+      flag:         currentKit.flag,
+      type:         currentKit.type,
+      version:      currentKit.version,
+      season:       currentKit.season,
+      size:         selectedSize,
+      badge:        badgeVal,
+      badgeLabel:   BADGE_LABELS[badgeVal],
+      shipping:     selectedShipping,
+      shippingLabel: SHIPPING[selectedShipping].label,
+      shippingCost: shipCost,
+      name, number, remark, price, qty: 1
+    });
+  }
+
+  closeModal();
+  updateCartUI();
+  openCart();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CART PANEL
+───────────────────────────────────────────────────────────── */
+function openCart() {
+  document.getElementById("cartOverlay").classList.add("open");
+  document.getElementById("cartPanel").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeCart() {
+  document.getElementById("cartOverlay").classList.remove("open");
+  document.getElementById("cartPanel").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function updateCartUI() {
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+
+  /* badge counter */
+  const badge = document.getElementById("cartBadge");
+  badge.style.display = totalQty > 0 ? "flex" : "none";
+  badge.textContent   = totalQty;
+
+  /* show/hide empty state vs table */
+  document.getElementById("emptyCartMsg").style.display = cart.length ? "none"  : "block";
+  document.getElementById("cartTable").style.display    = cart.length ? "table" : "none";
+
+  /* rows */
+  document.getElementById("cartRows").innerHTML = cart.map(item => {
+    const sub  = (item.price * item.qty).toFixed(2);
+    const customParts = [
+      item.name   ? `Name: ${item.name}`       : "",
+      item.number ? `#${item.number}`           : "",
+      item.badge !== "none" ? `Badge: ${item.badgeLabel}` : ""
+    ].filter(Boolean).join(" · ");
+
+    return `
+      <tr>
+        <td>
+          <div class="cart-item-row">
+            <img class="cart-thumb" ${imgAttrs(item.image, item.kitName)}>
+            <div class="cart-item-text">
+              <div class="cart-item-name">${item.flag} ${item.nation} ${item.type} · ${item.version}</div>
+              <div class="cart-item-detail">Size: ${item.size} · Weight: ${(0.25 * item.qty).toFixed(2)} Kg</div>
+              ${customParts ? `<div class="cart-item-custom">${customParts}</div>` : ""}
+              ${item.remark ? `<div class="cart-item-detail" style="font-style:italic">Remark: ${item.remark}</div>` : ""}
+            </div>
+          </div>
+        </td>
+        <td><span class="cart-price-cell">US$ ${item.price.toFixed(2)}</span></td>
+        <td>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty('${item.uid}', -1)">−</button>
+            <span  class="qty-val">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${item.uid}',  1)">+</button>
+          </div>
+        </td>
+        <td><span class="cart-price-cell">US$ ${sub}</span></td>
+        <td><button class="cart-remove" onclick="removeItem('${item.uid}')" title="Remove">🗑</button></td>
+      </tr>`;
+  }).join("");
+
+  updateSummary();
+}
+
+function changeQty(uid, delta) {
+  const idx = cart.findIndex(i => String(i.uid) === String(uid));
+  if (idx < 0) return;
+  cart[idx].qty += delta;
+  if (cart[idx].qty < 1) cart.splice(idx, 1);
+  updateCartUI();
+}
+
+function removeItem(uid) {
+  cart = cart.filter(i => String(i.uid) !== String(uid));
+  updateCartUI();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CART SUMMARY
+───────────────────────────────────────────────────────────── */
+function updateSummary() {
+  const bulkRate     = parseFloat(document.getElementById("discountSelect").value) || 0;
+  const productTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const totalWeight  = cart.reduce((s, i) => s + 0.25 * i.qty, 0);
+  const bulkDisc     = productTotal * bulkRate;
+  const totalDisc    = bulkDisc + couponDiscount;
+
+  // Shipping: use max cost among items (one shipment)
+  const hasPriority  = cart.some(i => i.shipping === "priority");
+  const shipCost     = cart.length === 0 ? 0 : (hasPriority ? 10 : 0);
+  const finalTotal   = Math.max(0, productTotal - totalDisc) + shipCost;
+
+  document.getElementById("sumProduct").textContent  = `US$ ${productTotal.toFixed(2)}`;
+  document.getElementById("sumDiscount").textContent = `US$ -${totalDisc.toFixed(2)}`;
+  document.getElementById("sumWeight").textContent   = `${totalWeight.toFixed(2)} Kg`;
+  document.getElementById("sumShipping").textContent = shipCost > 0
+    ? `US$ ${shipCost.toFixed(2)} (Priority)`
+    : cart.length ? "Free (Ordinary)" : "—";
+  document.getElementById("sumTotal").textContent    = `US$ ${finalTotal.toFixed(2)}`;
+}
+
+function applyCoupon() {
+  const code         = document.getElementById("couponInput").value.trim().toUpperCase();
+  const productTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const codes        = { SAVE5: .05, WORLD2026: .10, SUPER10: .10, KITSC15: .15 };
+
+  if (codes[code]) {
+    couponDiscount = parseFloat((productTotal * codes[code]).toFixed(2));
+    alert(`Coupon "${code}" applied — ${(codes[code] * 100).toFixed(0)}% discount added.`);
+  } else {
+    couponDiscount = 0;
+    if (code) alert("Invalid coupon. Try: SAVE5 · WORLD2026 · SUPER10 · KITSC15");
+  }
+  updateSummary();
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   INVOICE GENERATOR
+───────────────────────────────────────────────────────────── */
+function openInvoice() {
+  if (cart.length === 0) { alert("Your cart is empty."); return; }
+
+  const invNum  = "KITSC-" + Date.now().toString().slice(-8);
+  const now     = new Date();
+  const dateStr = now.toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+
+  document.getElementById("invNumber").textContent = invNum;
+  document.getElementById("invDate").textContent   = dateStr;
+
+  const bulkRate     = parseFloat(document.getElementById("discountSelect").value) || 0;
+  const productTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const bulkDisc     = productTotal * bulkRate;
+  const totalDisc    = bulkDisc + couponDiscount;
+  const hasPriority  = cart.some(i => i.shipping === "priority");
+  const shipCost     = hasPriority ? 10 : 0;
+  const finalTotal   = Math.max(0, productTotal - totalDisc) + shipCost;
+  const totalWeight  = cart.reduce((s, i) => s + 0.25 * i.qty, 0);
+
+  const rows = cart.map(item => `
+    <tr>
+      <td>
+        <strong>${item.flag} ${item.nation} ${item.type}</strong><br>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:#666">
+          ${item.version} · ${item.season} · Size: ${item.size}
+          ${item.badge !== "none" ? " · Patch: " + item.badgeLabel : ""}
+          ${item.name ? " · Name: " + item.name : ""}
+          ${item.number ? " #" + item.number : ""}
+        </span>
+        ${item.remark ? `<br><span style="font-size:10px;color:#888;font-style:italic">Remark: ${item.remark}</span>` : ""}
+      </td>
+      <td style="text-align:center">${item.qty}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace">US$ ${item.price.toFixed(2)}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:600">US$ ${(item.price * item.qty).toFixed(2)}</td>
+    </tr>`).join("");
+
+  const shippingMethod = hasPriority ? "Priority (30-35 days)" : "Ordinary (40-45 days)";
+
+  document.getElementById("invBody").innerHTML = `
+    <div class="inv-section-title">Order Details</div>
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="text-align:center">Qty</th>
+          <th style="text-align:right">Unit Price</th>
+          <th style="text-align:right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="inv-section-title">Shipping & Delivery</div>
+    <div class="inv-shipping-row">
+      <span class="lbl">Method</span>
+      <span class="val">${shippingMethod}</span>
+    </div>
+    <div class="inv-shipping-row">
+      <span class="lbl">Total Weight</span>
+      <span class="val">${totalWeight.toFixed(2)} Kg</span>
+    </div>
+    <div class="inv-shipping-row">
+      <span class="lbl">Shipping Cost</span>
+      <span class="val">${shipCost > 0 ? "US$ " + shipCost.toFixed(2) : "Free"}</span>
+    </div>
+
+    <div class="inv-section-title">Summary</div>
+    <div class="inv-totals">
+      <div class="inv-total-row">
+        <span class="lbl">Product Total</span>
+        <span class="amt">US$ ${productTotal.toFixed(2)}</span>
+      </div>
+      ${totalDisc > 0 ? `<div class="inv-total-row"><span class="lbl">Discount</span><span class="amt" style="color:#00A651">- US$ ${totalDisc.toFixed(2)}</span></div>` : ""}
+      ${shipCost > 0 ? `<div class="inv-total-row"><span class="lbl">Shipping</span><span class="amt">US$ ${shipCost.toFixed(2)}</span></div>` : ""}
+      <div class="inv-total-row final">
+        <span class="lbl">TOTAL DUE</span>
+        <span class="amt">US$ ${finalTotal.toFixed(2)}</span>
+      </div>
+    </div>
+
+    <div class="inv-section-title">Payment Notes</div>
+    <p style="font-size:12px;color:#555;line-height:1.6">
+      Payment via <strong>PayPal</strong> or <strong>Bank Transfer BAC or BANPRO</strong>. 
+      Please include invoice number <strong>${invNum}</strong> in your payment reference.
+      Orders are processed within 1–2 business days after payment confirmation.
+    </p>`;
+
+  document.getElementById("invoiceOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeInvoice() {
+  document.getElementById("invoiceOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+/* ── WhatsApp Invoice Send ── */
+function sendInvoiceWhatsApp() {
+  const WA_NUMBER = "50500000000"; // ← Reemplaza con tu número (código país + número, sin +)
+
+  const invNum  = document.getElementById("invNumber").textContent;
+  const invDate = document.getElementById("invDate").textContent;
+
+  const bulkRate     = parseFloat(document.getElementById("discountSelect").value) || 0;
+  const productTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const bulkDisc     = productTotal * bulkRate;
+  const totalDisc    = bulkDisc + couponDiscount;
+  const hasPriority  = cart.some(i => i.shipping === "priority");
+  const shipCost     = hasPriority ? 10 : 0;
+  const finalTotal   = Math.max(0, productTotal - totalDisc) + shipCost;
+  const shippingMethod = hasPriority ? "Priority (30-35 días)" : "Ordinary (40-45 días)";
+
+  let itemLines = cart.map((item, i) => {
+    let line = `  ${i + 1}. ${item.flag} ${item.nation} ${item.type} — ${item.version}`;
+    line += `\n     Talla: ${item.size}`;
+    if (item.badge !== "none") line += ` · Patch: ${item.badgeLabel}`;
+    if (item.name)   line += `\n     Nombre: ${item.name}`;
+    if (item.number) line += ` #${item.number}`;
+    if (item.remark) line += `\n     Nota: ${item.remark}`;
+    line += `\n     Cant: ${item.qty} × US$ ${item.price.toFixed(2)} = US$ ${(item.price * item.qty).toFixed(2)}`;
+    return line;
+  }).join("\n\n");
+
+  const msg =
+`🏆 *KITSC — National Teams*
+*Pedido / Invoice: ${invNum}*
+📅 Fecha: ${invDate}
+
+━━━━━━━━━━━━━━━━━━━
+🛒 *ARTÍCULOS:*
+${itemLines}
+
+━━━━━━━━━━━━━━━━━━━
+📦 Envío: ${shippingMethod}${shipCost > 0 ? ` (+US$ ${shipCost.toFixed(2)})` : " (Gratis)"}
+${totalDisc > 0 ? `💸 Descuento: -US$ ${totalDisc.toFixed(2)}\n` : ""}💰 *TOTAL: US$ ${finalTotal.toFixed(2)}*
+
+💳 Pago: 50% anticipo · 50% contra entrega
+(PayPal / Transferencia BAC o BANPRO)
+
+Por favor confirmar disponibilidad. ¡Gracias! 🙌`;
+
+  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+}
+
+function handleInvoiceOverlayClick(e) {
+  if (e.target === document.getElementById("invoiceOverlay")) closeInvoice();
+}
+
+function printInvoice() {
+  const box     = document.getElementById("invoiceBox");
+  const invNum  = document.getElementById("invNumber").textContent;
+  const content = box.outerHTML;
+
+  const win = window.open("", "_blank", "width=700,height=900");
+  win.document.write(`<!DOCTYPE html><html><head>
+    <title>Invoice ${invNum}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'DM Sans', sans-serif; background: #fff; padding: 0; }
+      .inv-actions { display: none !important; }
+      .invoice-box { max-width: 100%; box-shadow: none; border-radius: 0; }
+      .inv-header { background: #0E2914; color: #fff; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+      .inv-brand { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; }
+      .inv-brand-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: #4CD88A; margin-top: 2px; letter-spacing: 1px; }
+      .inv-meta { text-align: right; font-family: 'DM Mono', monospace; font-size: 11px; color: #8A9E8F; line-height: 1.8; }
+      .inv-meta span { color: #fff; }
+      .inv-body { padding: 1.5rem 2rem; }
+      .inv-section-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #00A651; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px; margin-bottom: .8rem; margin-top: 1.2rem; }
+      .inv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+      .inv-table th { background: #f5f5f5; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #666; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e0e0e0; }
+      .inv-table td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+      .inv-totals { margin-top: .8rem; }
+      .inv-total-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 13px; }
+      .inv-total-row.final { border-top: 2px solid #0E2914; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 16px; }
+      .inv-total-row .lbl { color: #555; }
+      .inv-total-row.final .lbl { color: #111; }
+      .inv-total-row .amt { font-family: 'DM Mono', monospace; }
+      .inv-total-row.final .amt { color: #00A651; font-size: 20px; }
+      .inv-footer { background: #f9f9f9; padding: 1rem 2rem; text-align: center; font-size: 11px; color: #888; border-top: 1px solid #e0e0e0; }
+      .inv-shipping-row { display: flex; justify-content: space-between; font-size: 12px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+      .inv-shipping-row .lbl { color: #555; }
+      .inv-shipping-row .val { font-family: 'DM Mono', monospace; color: #111; }
+      @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style>
+  </head><body>${content}
+  <script>window.onload = function(){ window.print(); }<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ZOOM — HOVER MAGNIFIER + LIGHTBOX
+   · Cada kit tiene su propia imagen (k.image por id).
+   · Hover sobre .modal-img-wrap  → lupa sigue al cursor (2.5×).
+   · Clic en el botón expand ↗    → lightbox con canvas pan+zoom.
+───────────────────────────────────────────────────────────── */
+
+/* ── Magnifier lens (hover en modal) ── */
+(function initMagnifier() {
+  const ZOOM = 2.8;           // factor de ampliación de la lupa
+  const LENS_R = 40;          // radio de la lupa en px
+
+  const wrap = document.getElementById("imgWrap");
+  const lens = document.getElementById("zoomLens");
+
+  wrap.addEventListener("mousemove", (e) => {
+    const img  = document.getElementById("modalKitImg");
+    const rect = wrap.getBoundingClientRect();
+
+    // posición del cursor relativa al contenedor
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // mover la lupa (centrada en el cursor)
+    lens.style.left = x + "px";
+    lens.style.top  = y + "px";
+
+    // calcular la posición de la imagen dentro del wrap (object-fit:contain)
+    const wW = rect.width,  wH = rect.height;
+    const nW = img.naturalWidth  || wW;
+    const nH = img.naturalHeight || wH;
+    const scale = Math.min(wW / nW, wH / nH);
+    const iW = nW * scale, iH = nH * scale;
+    const iX = (wW - iW) / 2, iY = (wH - iH) / 2;
+
+    // coordenadas dentro de la imagen renderizada
+    const rx = Math.max(0, Math.min(x - iX, iW));
+    const ry = Math.max(0, Math.min(y - iY, iH));
+
+    // porcentaje de posición sobre la imagen original
+    const px = (rx / iW) * nW;
+    const py = (ry / iH) * nH;
+
+    // background-position para el efecto lupa
+    const bgX = -(px * ZOOM - LENS_R);
+    const bgY = -(py * ZOOM - LENS_R);
+    const bgW = nW * ZOOM;
+    const bgH = nH * ZOOM;
+
+    lens.style.backgroundImage    = `url("${img.src}")`;
+    lens.style.backgroundRepeat   = "no-repeat";
+    lens.style.backgroundSize     = `${bgW}px ${bgH}px`;
+    lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+  });
+
+  wrap.addEventListener("mouseleave", () => {
+    lens.style.backgroundImage = "";
+  });
+})();
+
+/* ── Lightbox (canvas pan+zoom) ── */
+let lb = {
+  img: null, zoom: 1, ox: 0, oy: 0,
+  dragging: false, startX: 0, startY: 0, startOx: 0, startOy: 0
+};
+
+function openLightbox(e) {
+  e.stopPropagation();
+  const src  = document.getElementById("modalKitImg").src;
+  const name = currentKit ? `${currentKit.flag}  ${currentKit.name}  ·  ID #${currentKit.id}` : "";
+
+  document.getElementById("lbLabel").innerHTML =
+    name.replace("·", `<span>·</span>`);
+
+  // reset zoom state
+  lb.zoom = 1; lb.ox = 0; lb.oy = 0;
+  document.getElementById("lbZoomSlider").value = 1;
+  document.getElementById("lbZoomVal").textContent = "1×";
+
+  const image = new Image();
+  image.onload = () => {
+    lb.img = image;
+    lbDraw();
+    document.getElementById("lightbox").classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+  image.src = src;
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function handleLightboxClick(e) {
+  if (e.target === document.getElementById("lightbox")) closeLightbox();
+}
+
+function lbDraw() {
+  const canvas = document.getElementById("lbCanvas");
+  const img    = lb.img;
+  if (!img) return;
+
+  const isMobile = window.innerWidth <= 768;
+  const isTablet = window.innerWidth <= 1024 && window.innerWidth > 768;
+
+  // Márgenes adaptativos por dispositivo
+  const hPad = isMobile ? 0.94 : isTablet ? 0.90 : 0.88;
+  const vPad = isMobile ? 0.65 : isTablet ? 0.74 : 0.80;
+
+  const maxW = window.innerWidth  * hPad;
+  const maxH = window.innerHeight * vPad;
+
+  // "contain": escala uniforme, sin distorsión nunca
+  const base = Math.min(maxW / img.width, maxH / img.height);
+
+  // Tamaño CSS del canvas
+  const cssW = Math.round(img.width  * base);
+  const cssH = Math.round(img.height * base);
+
+  // DPR para nitidez en pantallas retina/móvil
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+
+  canvas.width  = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width    = cssW + "px";
+  canvas.style.height   = cssH + "px";
+  canvas.style.maxWidth = "100%";
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate((cssW / 2 + lb.ox) * dpr, (cssH / 2 + lb.oy) * dpr);
+  ctx.scale(lb.zoom * dpr, lb.zoom * dpr);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
+  ctx.restore();
+}
+
+function lbZoomStep(delta) {
+  lb.zoom = Math.min(4, Math.max(1, parseFloat((lb.zoom + delta).toFixed(2))));
+  if (lb.zoom === 1) { lb.ox = 0; lb.oy = 0; }
+  document.getElementById("lbZoomSlider").value = lb.zoom;
+  document.getElementById("lbZoomVal").textContent = lb.zoom.toFixed(1) + "×";
+  lbDraw();
+}
+
+function lbZoomFromSlider() {
+  lb.zoom = parseFloat(document.getElementById("lbZoomSlider").value);
+  if (lb.zoom === 1) { lb.ox = 0; lb.oy = 0; }
+  document.getElementById("lbZoomVal").textContent = lb.zoom.toFixed(1) + "×";
+  lbDraw();
+}
+
+/* scroll to zoom on canvas */
+document.getElementById("lbCanvas").addEventListener("wheel", (e) => {
+  e.preventDefault();
+  lbZoomStep(e.deltaY < 0 ? 0.15 : -0.15);
+}, { passive: false });
+
+/* drag to pan on canvas */
+document.getElementById("lbCanvas").addEventListener("mousedown", (e) => {
+  if (lb.zoom <= 1) return;
+  lb.dragging = true;
+  lb.startX = e.clientX; lb.startY = e.clientY;
+  lb.startOx = lb.ox;    lb.startOy = lb.oy;
+  e.currentTarget.style.cursor = "grabbing";
+});
+document.addEventListener("mousemove", (e) => {
+  if (!lb.dragging) return;
+  lb.ox = lb.startOx + (e.clientX - lb.startX);
+  lb.oy = lb.startOy + (e.clientY - lb.startY);
+  lbDraw();
+});
+document.addEventListener("mouseup", () => {
+  if (lb.dragging) {
+    lb.dragging = false;
+    const c = document.getElementById("lbCanvas");
+    if (c) c.style.cursor = lb.zoom > 1 ? "grab" : "crosshair";
+  }
+});
+
+/* touch pinch-zoom on canvas */
+let lastTouchDist = null;
+let lastTouchX = null, lastTouchY = null;
+
+document.getElementById("lbCanvas").addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    lastTouchX = null; lastTouchY = null;
+  } else if (e.touches.length === 1 && lb.zoom > 1) {
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+    lb.startOx = lb.ox; lb.startOy = lb.oy;
+  }
+}, { passive: true });
+
+document.getElementById("lbCanvas").addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2 && lastTouchDist !== null) {
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    const delta = (dist - lastTouchDist) * 0.012;
+    lastTouchDist = dist;
+    lbZoomStep(delta);
+  } else if (e.touches.length === 1 && lb.zoom > 1 && lastTouchX !== null) {
+    lb.ox = lb.startOx + (e.touches[0].clientX - lastTouchX);
+    lb.oy = lb.startOy + (e.touches[0].clientY - lastTouchY);
+    lbDraw();
+  }
+}, { passive: true });
+
+/* ESC closes lightbox */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeLightbox();
+});
+
+/* Redraw on resize / orientation change (móvil) */
+window.addEventListener("resize", () => {
+  if (document.getElementById("lightbox").classList.contains("open")) {
+    lbDraw();
+  }
+});
+
+/* ─────────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────────── */
+buildChips();
+renderGrid();
+
+</script>
+</body>
+</html>
