@@ -1046,28 +1046,6 @@ footer span { color: var(--green); }
           <input class="form-input" id="remark" placeholder="Specify whether the T-shirt is for a man, a woman, or a child.">
         </div>
 
-        <div class="form-group">
-          <div class="form-label">Shipping Method <span>* required</span></div>
-          <div class="shipping-options" id="shippingOptions">
-            <label class="shipping-opt selected">
-              <input type="radio" name="shipping" value="ordinary" onchange="onShippingChange(this)" checked>
-              <div class="shipping-opt-info">
-                <div class="shipping-opt-label">📦 Ordinary Shipping</div>
-                <div class="shipping-opt-desc">40-45 business days</div>
-              </div>
-              <div class="shipping-opt-price">+$0.00</div>
-            </label>
-            <label class="shipping-opt">
-              <input type="radio" name="shipping" value="priority" onchange="onShippingChange(this)">
-              <div class="shipping-opt-info">
-                <div class="shipping-opt-label">🚀 Priority Shipping</div>
-                <div class="shipping-opt-desc">30-35 business days</div>
-              </div>
-              <div class="shipping-opt-price">+$10.00</div>
-            </label>
-          </div>
-        </div>
-
         <div class="price-row">
           <div>
             <div class="price-total-label">Total price</div>
@@ -1123,6 +1101,26 @@ footer span { color: var(--green); }
       <input class="coupon-input" id="couponInput" placeholder="">
       <button class="coupon-apply" onclick="applyCoupon()">Apply</button>
     </div> -->
+    <div class="form-label" style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Shipping Method</div>
+    <div class="shipping-options" id="cartShippingOptions" style="margin-bottom:1rem;">
+      <label class="shipping-opt selected" id="cartShipOrdinary">
+        <input type="radio" name="cartShipping" value="ordinary" onchange="onCartShippingChange(this)" checked>
+        <div class="shipping-opt-info">
+          <div class="shipping-opt-label">📦 Ordinary Shipping</div>
+          <div class="shipping-opt-desc">40-45 business days</div>
+        </div>
+        <div class="shipping-opt-price">Free</div>
+      </label>
+      <label class="shipping-opt" id="cartShipPriority">
+        <input type="radio" name="cartShipping" value="priority" onchange="onCartShippingChange(this)">
+        <div class="shipping-opt-info">
+          <div class="shipping-opt-label">🚀 Priority Shipping</div>
+          <div class="shipping-opt-desc">30-35 business days</div>
+        </div>
+        <div class="shipping-opt-price">+$10.00</div>
+      </label>
+    </div>
+
     <div class="summary-lines">
       <div class="summary-line">
         <span class="s-label">Product Price</span>
@@ -1531,7 +1529,7 @@ let activeConf   = "All";
 let currentView  = "grid";
 let currentKit   = null;
 let selectedSize = null;
-let selectedShipping = "ordinary";
+let cartShipping = "ordinary";   // global shipping for the whole order
 let cart         = [];
 let couponDiscount = 0;
 
@@ -1657,16 +1655,12 @@ function openModal(id) {
   if (!currentKit) return;
 
   selectedSize = null;
-  selectedShipping = "ordinary";
 
   /* reset form */
   document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
   document.querySelectorAll(".badge-opt").forEach(b => b.classList.remove("selected"));
   document.querySelector(".badge-opt").classList.add("selected");
   document.querySelector('input[name="badge"][value="none"]').checked = true;
-  document.querySelectorAll(".shipping-opt").forEach(b => b.classList.remove("selected"));
-  document.querySelector(".shipping-opt").classList.add("selected");
-  document.querySelector('input[name="shipping"][value="ordinary"]').checked = true;
   document.getElementById("playerName").value   = "";
   document.getElementById("playerNumber").value = "";
   document.getElementById("remark").value       = "";
@@ -1714,13 +1708,6 @@ function onBadgeChange(radio) {
   calcPrice();
 }
 
-function onShippingChange(radio) {
-  document.querySelectorAll(".shipping-opt").forEach(b => b.classList.remove("selected"));
-  radio.closest(".shipping-opt").classList.add("selected");
-  selectedShipping = radio.value;
-  calcPrice();
-}
-
 /** Live name/number overlay on the kit image */
 function updatePreview() {
   const name   = document.getElementById("playerName").value.trim().toUpperCase();
@@ -1740,13 +1727,11 @@ function calcPrice() {
   if (!currentKit) return;
   const badgeVal  = document.querySelector('input[name="badge"]:checked')?.value || "none";
   const extra     = BADGE_PRICES[badgeVal] || 0;
-  const shipCost  = SHIPPING[selectedShipping]?.price || 0;
-  const total     = (currentKit.price + extra + shipCost).toFixed(2);
+  const total     = (currentKit.price + extra).toFixed(2);
 
   document.getElementById("modalPriceVal").textContent  = total;
   const parts = [];
-  if (extra > 0)    parts.push(`Badge +$${extra.toFixed(2)}`);
-  if (shipCost > 0) parts.push(`Ship +$${shipCost.toFixed(2)}`);
+  if (extra > 0) parts.push(`Badge +$${extra.toFixed(2)}`);
   document.getElementById("priceBreakdown").textContent = parts.join(" · ");
 }
 
@@ -1759,7 +1744,6 @@ function addToCart() {
 
   const badgeVal  = document.querySelector('input[name="badge"]:checked')?.value || "none";
   const extra     = BADGE_PRICES[badgeVal] || 0;
-  const shipCost  = SHIPPING[selectedShipping]?.price || 0;
   const name      = document.getElementById("playerName").value.trim().toUpperCase();
   const number    = document.getElementById("playerNumber").value.trim();
   const remark    = document.getElementById("remark").value.trim();
@@ -1770,7 +1754,6 @@ function addToCart() {
     i.kitId    === currentKit.id &&
     i.size     === selectedSize  &&
     i.badge    === badgeVal      &&
-    i.shipping === selectedShipping &&
     i.name     === name          &&
     i.number   === number
   );
@@ -1791,9 +1774,6 @@ function addToCart() {
       size:         selectedSize,
       badge:        badgeVal,
       badgeLabel:   BADGE_LABELS[badgeVal],
-      shipping:     selectedShipping,
-      shippingLabel: SHIPPING[selectedShipping].label,
-      shippingCost: shipCost,
       name, number, remark, price, qty: 1
     });
   }
@@ -1882,6 +1862,16 @@ function removeItem(uid) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   CART SHIPPING SELECTOR
+───────────────────────────────────────────────────────────── */
+function onCartShippingChange(radio) {
+  cartShipping = radio.value;
+  document.querySelectorAll("#cartShippingOptions .shipping-opt").forEach(b => b.classList.remove("selected"));
+  radio.closest(".shipping-opt").classList.add("selected");
+  updateSummary();
+}
+
+/* ─────────────────────────────────────────────────────────────
    CART SUMMARY
 ───────────────────────────────────────────────────────────── */
 function updateSummary() {
@@ -1891,9 +1881,7 @@ function updateSummary() {
   const bulkDisc     = productTotal * bulkRate;
   const totalDisc    = bulkDisc + couponDiscount;
 
-  // Shipping: use max cost among items (one shipment)
-  const hasPriority  = cart.some(i => i.shipping === "priority");
-  const shipCost     = cart.length === 0 ? 0 : (hasPriority ? 10 : 0);
+  const shipCost     = cart.length === 0 ? 0 : (cartShipping === "priority" ? 10 : 0);
   const finalTotal   = Math.max(0, productTotal - totalDisc) + shipCost;
 
   document.getElementById("sumProduct").textContent  = `US$ ${productTotal.toFixed(2)}`;
@@ -1938,8 +1926,7 @@ function openInvoice() {
   const productTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const bulkDisc     = productTotal * bulkRate;
   const totalDisc    = bulkDisc + couponDiscount;
-  const hasPriority  = cart.some(i => i.shipping === "priority");
-  const shipCost     = hasPriority ? 10 : 0;
+  const shipCost     = cartShipping === "priority" ? 10 : 0;
   const finalTotal   = Math.max(0, productTotal - totalDisc) + shipCost;
   const totalWeight  = cart.reduce((s, i) => s + 0.25 * i.qty, 0);
 
@@ -1960,7 +1947,7 @@ function openInvoice() {
       <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:600">US$ ${(item.price * item.qty).toFixed(2)}</td>
     </tr>`).join("");
 
-  const shippingMethod = hasPriority ? "Priority (30-35 days)" : "Ordinary (40-45 days)";
+  const shippingMethod = cartShipping === "priority" ? "Priority (30-35 days)" : "Ordinary (40-45 days)";
 
   document.getElementById("invBody").innerHTML = `
     <div class="inv-section-title">Order Details</div>
