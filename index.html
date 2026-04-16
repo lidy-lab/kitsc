@@ -975,7 +975,7 @@ footer span { color: var(--green); }
           <button class="zoom-expand-btn" onclick="openLightbox(event)" title="View full size">
             <svg viewBox="0 0 24 24" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
           </button>
-          <div class="zoom-hint">HOVER TO ZOOM</div>
+          <!-- <div class="zoom-hint">HOVER TO ZOOM</div> -->
           <div class="modal-preview-overlay" id="previewOverlay">
             <div class="modal-preview-name"   id="previewName"></div>
             <div class="modal-preview-number" id="previewNumber"></div>
@@ -1146,7 +1146,7 @@ footer span { color: var(--green); }
       </div>
     </div>
     <button class="invoice-btn" onclick="openInvoice()">📄 GENERATE INVOICE (PDF)</button>
-    <button class="checkout-btn">Proceed to Checkout</button>
+    <!-- <button class="checkout-btn">Proceed to Checkout</button> -->
     <button class="continue-btn" onclick="closeCart()">&#60; Continue Shopping</button>
   </div>
 </div>
@@ -2006,7 +2006,7 @@ function openInvoice() {
 
     <div class="inv-section-title">Payment Notes</div>
     <p style="font-size:12px;color:#555;line-height:1.6">
-      Payment via <strong>PayPal</strong> or <strong>Bank Transfer BAC or BANPRO</strong>. 
+      Payment via <strong>Bank Transfer BAC or BANPRO</strong>. 
       Please include invoice number <strong>${invNum}</strong> in your payment reference.
       Orders are processed within 1–2 business days after payment confirmation.
     </p>`;
@@ -2022,7 +2022,7 @@ function closeInvoice() {
 
 /* ── WhatsApp Invoice Send ── */
 function sendInvoiceWhatsApp() {
-  const WA_NUMBER = "50500000000"; // ← Reemplaza con tu número (código país + número, sin +)
+  const WA_NUMBER = "50558648269"; // ← Reemplaza con tu número (código país + número, sin +)
 
   const invNum  = document.getElementById("invNumber").textContent;
   const invDate = document.getElementById("invDate").textContent;
@@ -2061,7 +2061,7 @@ ${itemLines}
 ${totalDisc > 0 ? `💸 Descuento: -US$ ${totalDisc.toFixed(2)}\n` : ""}💰 *TOTAL: US$ ${finalTotal.toFixed(2)}*
 
 💳 Pago: 50% anticipo · 50% contra entrega
-(PayPal / Transferencia BAC o BANPRO)
+(Transferencia BAC o BANPRO)
 
 Por favor confirmar disponibilidad. ¡Gracias! 🙌`;
 
@@ -2123,58 +2123,58 @@ function printInvoice() {
    · Clic en el botón expand ↗    → lightbox con canvas pan+zoom.
 ───────────────────────────────────────────────────────────── */
 
-/* ── Magnifier lens (hover en modal) ── */
-(function initMagnifier() {
-  const ZOOM = 2.8;           // factor de ampliación de la lupa
-  const LENS_R = 40;          // radio de la lupa en px
+// /* ── Magnifier lens (hover en modal) ── */
+// (function initMagnifier() {
+//   const ZOOM = 2.8;           // factor de ampliación de la lupa
+//   const LENS_R = 40;          // radio de la lupa en px
 
-  const wrap = document.getElementById("imgWrap");
-  const lens = document.getElementById("zoomLens");
+//   const wrap = document.getElementById("imgWrap");
+//   const lens = document.getElementById("zoomLens");
 
-  wrap.addEventListener("mousemove", (e) => {
-    const img  = document.getElementById("modalKitImg");
-    const rect = wrap.getBoundingClientRect();
+//   wrap.addEventListener("mousemove", (e) => {
+//     const img  = document.getElementById("modalKitImg");
+//     const rect = wrap.getBoundingClientRect();
 
-    // posición del cursor relativa al contenedor
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+//     // posición del cursor relativa al contenedor
+//     const x = e.clientX - rect.left;
+//     const y = e.clientY - rect.top;
 
-    // mover la lupa (centrada en el cursor)
-    lens.style.left = x + "px";
-    lens.style.top  = y + "px";
+//     // mover la lupa (centrada en el cursor)
+//     lens.style.left = x + "px";
+//     lens.style.top  = y + "px";
 
-    // calcular la posición de la imagen dentro del wrap (object-fit:contain)
-    const wW = rect.width,  wH = rect.height;
-    const nW = img.naturalWidth  || wW;
-    const nH = img.naturalHeight || wH;
-    const scale = Math.min(wW / nW, wH / nH);
-    const iW = nW * scale, iH = nH * scale;
-    const iX = (wW - iW) / 2, iY = (wH - iH) / 2;
+//     // calcular la posición de la imagen dentro del wrap (object-fit:contain)
+//     const wW = rect.width,  wH = rect.height;
+//     const nW = img.naturalWidth  || wW;
+//     const nH = img.naturalHeight || wH;
+//     const scale = Math.min(wW / nW, wH / nH);
+//     const iW = nW * scale, iH = nH * scale;
+//     const iX = (wW - iW) / 2, iY = (wH - iH) / 2;
 
-    // coordenadas dentro de la imagen renderizada
-    const rx = Math.max(0, Math.min(x - iX, iW));
-    const ry = Math.max(0, Math.min(y - iY, iH));
+//     // coordenadas dentro de la imagen renderizada
+//     const rx = Math.max(0, Math.min(x - iX, iW));
+//     const ry = Math.max(0, Math.min(y - iY, iH));
 
-    // porcentaje de posición sobre la imagen original
-    const px = (rx / iW) * nW;
-    const py = (ry / iH) * nH;
+//     // porcentaje de posición sobre la imagen original
+//     const px = (rx / iW) * nW;
+//     const py = (ry / iH) * nH;
 
-    // background-position para el efecto lupa
-    const bgX = -(px * ZOOM - LENS_R);
-    const bgY = -(py * ZOOM - LENS_R);
-    const bgW = nW * ZOOM;
-    const bgH = nH * ZOOM;
+//     // background-position para el efecto lupa
+//     const bgX = -(px * ZOOM - LENS_R);
+//     const bgY = -(py * ZOOM - LENS_R);
+//     const bgW = nW * ZOOM;
+//     const bgH = nH * ZOOM;
 
-    lens.style.backgroundImage    = `url("${img.src}")`;
-    lens.style.backgroundRepeat   = "no-repeat";
-    lens.style.backgroundSize     = `${bgW}px ${bgH}px`;
-    lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
-  });
+//     lens.style.backgroundImage    = `url("${img.src}")`;
+//     lens.style.backgroundRepeat   = "no-repeat";
+// //     lens.style.backgroundSize     = `${bgW}px ${bgH}px`;
+// //     lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+// //   });
 
-  wrap.addEventListener("mouseleave", () => {
-    lens.style.backgroundImage = "";
-  });
-})();
+//   wrap.addEventListener("mouseleave", () => {
+//     lens.style.backgroundImage = "";
+//   });
+// })();
 
 /* ── Lightbox (canvas pan+zoom) ── */
 let lb = {
