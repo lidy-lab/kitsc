@@ -527,6 +527,7 @@ header {
 }
 .size-btn:hover          { border-color: var(--border-hi); color: var(--white); }
 .size-btn.selected       { background: var(--green); border-color: var(--green); color: #fff; font-weight: 700; }
+.size-btn:disabled       { opacity: .28; cursor: not-allowed; pointer-events: none; }
 
 /* badge options */
 .badge-options { display: flex; flex-direction: column; gap: 6px; }
@@ -998,13 +999,13 @@ footer span { color: var(--green); }
             <button class="size-btn" onclick="selectSize(this,'L')">L</button>
             <button class="size-btn" onclick="selectSize(this,'XL')">XL</button>
             <button class="size-btn" onclick="selectSize(this,'2XL')">2XL</button>
-            <button class="size-btn" onclick="selectSize(this,'16')">16</button>
-            <button class="size-btn" onclick="selectSize(this,'18')">18</button>
-            <button class="size-btn" onclick="selectSize(this,'20')">20</button>
-            <button class="size-btn" onclick="selectSize(this,'22')">22</button>
-            <button class="size-btn" onclick="selectSize(this,'24')">24</button>
-            <button class="size-btn" onclick="selectSize(this,'26')">26</button>
-            <button class="size-btn" onclick="selectSize(this,'28')">28</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'16')">16</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'18')">18</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'20')">20</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'22')">22</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'24')">24</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'26')">26</button>
+            <button class="size-btn" data-child onclick="selectSize(this,'28')">28</button>
           </div>
         </div>
 
@@ -1682,6 +1683,11 @@ function openModal(id) {
   const isFan = currentKit.version === "Fan";
   document.getElementById("labelWomen").style.display     = isFan ? "" : "none";
   document.getElementById("labelChildrens").style.display = isFan ? "" : "none";
+
+  /* enable/disable children size buttons (16–28) based on version */
+  document.querySelectorAll(".size-btn[data-child]").forEach(btn => {
+    btn.disabled = !isFan;
+  });
 
   calcPrice();
 
