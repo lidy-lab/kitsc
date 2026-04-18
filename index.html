@@ -1052,7 +1052,7 @@ footer span { color: var(--green); }
             <div class="price-total-val"><sup>US$</sup><span id="modalPriceVal">0.00</span></div>
           </div>
           <div class="price-meta">
-            Weight: 0.25–0.3 kg<br>
+            <br>
             <span id="priceBreakdown"></span>
           </div>
         </div>
@@ -1111,14 +1111,14 @@ footer span { color: var(--green); }
         </div>
         <div class="shipping-opt-price">Free</div>
       </label>
-      <label class="shipping-opt" id="cartShipPriority">
+      <!-- <label class="shipping-opt" id="cartShipPriority">
         <input type="radio" name="cartShipping" value="priority" onchange="onCartShippingChange(this)">
         <div class="shipping-opt-info">
           <div class="shipping-opt-label">🚀 Priority Shipping</div>
           <div class="shipping-opt-desc">30-35 business days</div>
         </div>
         <div class="shipping-opt-price">+$10.00</div>
-      </label>
+      </label> -->
     </div>
 
     <div class="summary-lines">
@@ -1130,10 +1130,10 @@ footer span { color: var(--green); }
         <span class="s-label">Promotion Discount</span>
         <span class="s-val" id="sumDiscount">US$ -0.00</span>
       </div>
-      <div class="summary-line">
+      <!-- <div class="summary-line">
         <span class="s-label">Weight</span>
         <span class="s-val" id="sumWeight">0.00 Kg</span>
-      </div>
+      </div> -->
       <div class="summary-line shipping">
         <span class="s-label">Shipping</span>
         <span class="s-val" id="sumShipping">—</span>
@@ -1217,7 +1217,7 @@ footer span { color: var(--green); }
           <div class="aviso-item-icon">📅</div>
           <div class="aviso-item-body">
             <div class="aviso-item-label">Fecha límite de pedidos</div>
-            <div class="aviso-item-val">25 de Abril, 2026</div>
+            <div class="aviso-item-val">28 de Abril, 2026</div>
           </div>
         </div>
         <div class="aviso-item">
@@ -1535,7 +1535,7 @@ let couponDiscount = 0;
 
 const SHIPPING = {
   ordinary: { label: "Ordinary Shipping (40-45 days)", price: 0 },
-  priority: { label: "Priority Shipping (30-35 days)",  price: 10 }
+  /*priority: { label: "Priority Shipping (30-35 days)",  price: 10 }*/
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -1826,7 +1826,7 @@ function updateCartUI() {
             <img class="cart-thumb" ${imgAttrs(item.image, item.kitName)}>
             <div class="cart-item-text">
               <div class="cart-item-name">${item.flag} ${item.nation} ${item.type} · ${item.version}</div>
-              <div class="cart-item-detail">Size: ${item.size} · Weight: ${(0.25 * item.qty).toFixed(2)} Kg</div>
+              <div class="cart-item-detail">Size: ${item.size} · Weight: ${(0 * item.qty).toFixed(2)} </div>
               ${customParts ? `<div class="cart-item-custom">${customParts}</div>` : ""}
               ${item.remark ? `<div class="cart-item-detail" style="font-style:italic">Remark: ${item.remark}</div>` : ""}
             </div>
@@ -1886,7 +1886,7 @@ function updateSummary() {
 
   document.getElementById("sumProduct").textContent  = `US$ ${productTotal.toFixed(2)}`;
   document.getElementById("sumDiscount").textContent = `US$ -${totalDisc.toFixed(2)}`;
-  document.getElementById("sumWeight").textContent   = `${totalWeight.toFixed(2)} Kg`;
+  /*document.getElementById("sumWeight").textContent   = `${totalWeight.toFixed(2)} Kg`;*/
   document.getElementById("sumShipping").textContent = shipCost > 0
     ? `US$ ${shipCost.toFixed(2)} (Priority)`
     : cart.length ? "Free (Ordinary)" : "—";
@@ -1968,10 +1968,7 @@ function openInvoice() {
       <span class="lbl">Method</span>
       <span class="val">${shippingMethod}</span>
     </div>
-    <div class="inv-shipping-row">
-      <span class="lbl">Total Weight</span>
-      <span class="val">${totalWeight.toFixed(2)} Kg</span>
-    </div>
+    
     <div class="inv-shipping-row">
       <span class="lbl">Shipping Cost</span>
       <span class="val">${shipCost > 0 ? "US$ " + shipCost.toFixed(2) : "Free"}</span>
